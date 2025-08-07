@@ -24,7 +24,7 @@ public class UserController {
      * @param userRequestDto 유저 생성 요청 정보
      * @return 생성된 유저 정보
      */
-    @PostMapping("/users")
+    @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto) {
         return new ResponseEntity<>(userService.saveUser(userRequestDto), HttpStatus.CREATED);
     }

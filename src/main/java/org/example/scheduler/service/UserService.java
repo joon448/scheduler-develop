@@ -37,7 +37,11 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto saveUser(UserRequestDto userRequestDto){
+
         validateUserRequest(userRequestDto);
+        if (userRepository.existsByEmail(userRequestDto.getEmail())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
+        }
         User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), userRequestDto.getPassword());
 
         userRepository.save(user);
