@@ -1,6 +1,9 @@
 package org.example.scheduler.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.scheduler.dto.login.LoginRequestDto;
 import org.example.scheduler.dto.user.UserDeleteRequestDto;
 import org.example.scheduler.dto.user.UserRequestDto;
 import org.example.scheduler.dto.user.UserResponseDto;
@@ -73,6 +76,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id, @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
         userService.deleteUser(id, userDeleteRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
+        userService.login(loginRequestDto, request);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
 //    /**

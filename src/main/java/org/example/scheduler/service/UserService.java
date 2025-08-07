@@ -1,6 +1,8 @@
 package org.example.scheduler.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.example.scheduler.dto.login.LoginRequestDto;
 import org.example.scheduler.dto.schedule.ScheduleRequestDto;
 import org.example.scheduler.dto.user.UserDeleteRequestDto;
 import org.example.scheduler.dto.user.UserRequestDto;
@@ -116,6 +118,17 @@ public class UserService {
         validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
         scheduleRepository.deleteByUserId(id); // 해당 유저의 일정 먼저 삭제
         userRepository.delete(user);
+    }
+
+
+    public void login(LoginRequestDto loginRequestDto, HttpServletRequest request) {
+        User user = userRepository.findByEmailOrElseThrow(loginRequestDto.getEmail());
+
+        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+
+        request.getSession().setAttribute("userId", user.getId());
     }
 
     /**
