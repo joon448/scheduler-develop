@@ -2,6 +2,7 @@ package org.example.scheduler.dto.schedule;
 
 import lombok.Getter;
 import org.example.scheduler.entity.Schedule;
+import org.example.scheduler.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 public class ScheduleResponseDto {
     private final Long id;                  // 일정 ID
-    private final String name;              // 작성자명
+    private final Long userId;              // 유저 ID
     private final String title;             // 제목
     private final String content;           // 내용
     private final LocalDateTime createdAt;  // 작성일
@@ -20,7 +21,7 @@ public class ScheduleResponseDto {
 
     public ScheduleResponseDto(Schedule schedule) {
         this.id = schedule.getId();
-        this.name = schedule.getName();
+        this.userId = schedule.getUser().getId();
         this.title = schedule.getTitle();
         this.content = schedule.getContent();
         this.createdAt = schedule.getCreatedAt();

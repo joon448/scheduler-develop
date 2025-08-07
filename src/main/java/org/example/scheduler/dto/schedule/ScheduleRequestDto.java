@@ -7,8 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public class ScheduleRequestDto {
-    private String name;        // 작성자명
-    private String password;    // 비밀번호
+    private Long userId;        // 유저 아이디
     private String title;       // 제목
     private String content;     // 내용
 }

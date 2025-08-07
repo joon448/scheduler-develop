@@ -19,16 +19,10 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // 일정 ID (자동 생성)
 
-    // @Column(nullable = false, length = 20)
-    // private String name;    // 작성자명
-
     @Setter
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
-
-    @Column(nullable = false, length = 50)
-    private String password;    // 비밀번호
 
     @Column(nullable = false, length = 30)
     private String title;   //제목
@@ -36,8 +30,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String content;     // 내용
 
-    public Schedule(String password, String title, String content) {
-        this.password = password;
+    public Schedule(String title, String content) {
         this.title = title;
         this.content = content;
     }

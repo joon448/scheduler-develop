@@ -1,20 +1,32 @@
 package org.example.scheduler.repository;
 
 import org.example.scheduler.entity.Schedule;
+import org.example.scheduler.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Schedule Entity에 대한 JPA 리포지토리 인터페이스
  */
 public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
+    List<Schedule> findByUserIdOrderByModifiedAtDesc(Long userId);
 
-    /**
-     * 특정 작성자명에 해당하는 모든 일정 조회
-     *
-     * @param name 작성자명
-     * @return 일정 목록
-     */
-    List<Schedule> findByName(String name);
+    void deleteByUserId(Long id);
+
+    default Schedule findByIdOrElseThrow(Long id){
+        return findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 일정 ID입니다."));
+    }
+
+
+//    /**
+//     * 특정 작성자명에 해당하는 모든 일정 조회
+//     *
+//     * @param name 작성자명
+//     * @return 일정 목록
+//     */
+//    List<Schedule> findByName(String name);
 }

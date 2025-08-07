@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService scheduleService;
-    private final CommentService commentService;
+    // private final CommentService commentService;
 
     /**
      * 새로운 일정 등록
@@ -37,10 +37,7 @@ public class ScheduleController {
      */
     @GetMapping("/schedules")
     public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@RequestParam(required = false) String name) {
-        if (name == null) {
-            return new ResponseEntity<>(scheduleService.getAllSchedules(),  HttpStatus.OK);
-        }
-        return new ResponseEntity<>(scheduleService.getSchedulesByName(name), HttpStatus.OK);
+        return new ResponseEntity<>(scheduleService.getAllSchedules(),  HttpStatus.OK);
     }
 
     /**
@@ -82,11 +79,10 @@ public class ScheduleController {
      * 특정 ID의 일정 삭제
      *
      * @param id 일정 ID
-     * @param scheduleDeleteRequestDto 삭제 요청 정보 (비밀번호)
      */
     @DeleteMapping("/schedules/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @RequestBody ScheduleDeleteRequestDto scheduleDeleteRequestDto) {
-        scheduleService.deleteSchedule(id, scheduleDeleteRequestDto);
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
+        scheduleService.deleteSchedule(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

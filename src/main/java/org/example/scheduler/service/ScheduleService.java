@@ -1,17 +1,17 @@
 package org.example.scheduler.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.scheduler.dto.comment.CommentResponseDto;
 import org.example.scheduler.dto.schedule.*;
-import org.example.scheduler.entity.Comment;
 import org.example.scheduler.entity.Schedule;
-import org.example.scheduler.repository.CommentRepository;
+import org.example.scheduler.entity.User;
 import org.example.scheduler.repository.ScheduleRepository;
+import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
-    private final CommentRepository commentRepository;
+    // private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     /**
      * 일정 저장
@@ -36,7 +37,11 @@ public class ScheduleService {
     @Transactional
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto scheduleRequestDto){
         validateScheduleRequest(scheduleRequestDto, "등록");
-        Schedule schedule = new Schedule(scheduleRequestDto.getName(), scheduleRequestDto.getPassword(), scheduleRequestDto.getTitle(), scheduleRequestDto.getContent());
+
+        User user = userRepository.findByIdOrElseThrow(scheduleRequestDto.getUserId());
+
+        Schedule schedule = new Schedule(scheduleRequestDto.getTitle(), scheduleRequestDto.getContent());
+        schedule.setUser(user);
 
         scheduleRepository.save(schedule);
 
@@ -60,36 +65,35 @@ public class ScheduleService {
     /**
      * 작성자명으로 일정 조회
      *
-     * @param name 작성자명
+     * @param userId 유저 ID
      * @return 특정 작성자의 일정 목록 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional(readOnly = true)
-    public List<ScheduleResponseDto> getSchedulesByName(String name) {
-        return scheduleRepository.findByName(name) // 최신 수정일 기준 내림차순 정렬
+    public List<ScheduleResponseDto> getSchedulesByUserId(Long userId) {
+        return scheduleRepository.findByUserIdOrderByModifiedAtDesc(userId) // 최신 수정일 기준 내림차순 정렬
                 .stream()
-                .sorted(Comparator.comparing(Schedule::getModifiedAt).reversed())
                 .map(ScheduleResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 특정 일정 및 댓글 조회
-     *
-     * @param id 일정 ID
-     * @return 특정 일정 + 댓글 목록 응답 DTO (최신 수정일 순 정렬)
-     */
-    @Transactional(readOnly = true)
-    public ScheduleWithCommentsResponseDto getScheduleWithCommentsById(Long id) {
-        Schedule schedule = getScheduleOrThrow(id, "조회");
-
-        List<CommentResponseDto> comments = commentRepository.findByScheduleId(id) // 최신 수정일 기준 내림차순 정렬
-                .stream()
-                .sorted(Comparator.comparing(Comment::getModifiedAt).reversed())
-                .map(CommentResponseDto::new)
-                .collect(Collectors.toList());
-
-        return new ScheduleWithCommentsResponseDto(new ScheduleResponseDto(schedule), comments);
-    }
+//    /**
+//     * 특정 일정 및 댓글 조회
+//     *
+//     * @param id 일정 ID
+//     * @return 특정 일정 + 댓글 목록 응답 DTO (최신 수정일 순 정렬)
+//     */
+//    @Transactional(readOnly = true)
+//    public ScheduleWithCommentsResponseDto getScheduleWithCommentsById(Long id) {
+//        Schedule schedule = getScheduleOrThrow(id, "조회");
+//
+//        List<CommentResponseDto> comments = commentRepository.findByScheduleId(id) // 최신 수정일 기준 내림차순 정렬
+//                .stream()
+//                .sorted(Comparator.comparing(Comment::getModifiedAt).reversed())
+//                .map(CommentResponseDto::new)
+//                .collect(Collectors.toList());
+//
+//        return new ScheduleWithCommentsResponseDto(new ScheduleResponseDto(schedule), comments);
+//    }
 
     /**
      * 특정 일정 조회
@@ -99,7 +103,7 @@ public class ScheduleService {
      */
     @Transactional(readOnly = true)
     public ScheduleResponseDto getScheduleById(Long id) {
-        Schedule schedule = getScheduleOrThrow(id, "조회");
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
         return new ScheduleResponseDto(schedule);
     }
 
@@ -112,13 +116,13 @@ public class ScheduleService {
      */
     @Transactional
     public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
-        validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
-        Schedule schedule = getScheduleOrThrow(id, "수정");
-        validatePassword(schedule, scheduleUpdateRequestDto.getPassword(), "수정");
+        //validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+        //validatePassword(schedule, scheduleUpdateRequestDto.getPassword(), "수정");
 
-        if(scheduleUpdateRequestDto.getName()!=null){
-            schedule.updateName(scheduleUpdateRequestDto.getName());
-        }
+//        if(scheduleUpdateRequestDto.getName()!=null){
+//            schedule.updateName(scheduleUpdateRequestDto.getName());
+//        }
         if(scheduleUpdateRequestDto.getTitle()!=null){
             schedule.updateTitle(scheduleUpdateRequestDto.getTitle());
         }
@@ -131,25 +135,16 @@ public class ScheduleService {
      * 특정 일정 및 관련 댓글 삭제
      *
      * @param id 일정 ID
-     * @param scheduleDeleteRequestDto 일정 삭제 요청 데이터
      */
     @Transactional
-    public void deleteSchedule(Long id, ScheduleDeleteRequestDto scheduleDeleteRequestDto) {
-        Schedule schedule = getScheduleOrThrow(id, "삭제");
-        validatePassword(schedule, scheduleDeleteRequestDto.getPassword(), "삭제");
+    public void deleteSchedule(Long id) {
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+        //validatePassword(schedule, scheduleDeleteRequestDto.getPassword(), "삭제");
 
-        commentRepository.deleteByScheduleId(id);
+        // commentRepository.deleteByScheduleId(id);
         scheduleRepository.delete(schedule);
     }
 
-    /**
-     * 유효한 일정 ID 검증 및 일정 반환
-     * @throws ResponseStatusException 유효하지 않은 경우 404 반환
-     */
-    private Schedule getScheduleOrThrow(Long id, String action){
-        return scheduleRepository.findById(id)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "일정 "+action+" 실패: 존재하지 않는 ID 입니다."));
-    }
 
     /**
      * 일정 생성 요청 데이터 검증
@@ -158,20 +153,14 @@ public class ScheduleService {
      * @throws ResponseStatusException 유효하지 않은 경우 400 반환
      */
     private void validateScheduleRequest(ScheduleRequestDto scheduleRequestDto, String action) {
-        if (scheduleRequestDto.getName() == null || scheduleRequestDto.getName().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 작성자명을 입력해주세요.");
-        }
-        if (scheduleRequestDto.getPassword() == null || scheduleRequestDto.getPassword().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 비밀번호를 입력해주세요.");
+        if (scheduleRequestDto.getUserId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 유저 ID를 입력해주세요.");
         }
         if (scheduleRequestDto.getTitle() == null || scheduleRequestDto.getTitle().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목을 입력해주세요.");
         }
         if (scheduleRequestDto.getContent() == null || scheduleRequestDto.getContent().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 내용을 입력해주세요.");
-        }
-        if(scheduleRequestDto.getName().length() > 20){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 작성자명은 최대 20자까지 입력 가능합니다.");
         }
         if(scheduleRequestDto.getTitle().length() > 30){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목은 최대 30자까지 입력 가능합니다.");
@@ -188,28 +177,19 @@ public class ScheduleService {
      * @throws ResponseStatusException 유효하지 않은 경우 400 반환
      */
     private void validateScheduleUpdateRequest(ScheduleUpdateRequestDto scheduleUpdateRequestDto, String action) {
-        if (scheduleUpdateRequestDto.getPassword() == null || scheduleUpdateRequestDto.getPassword().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 비밀번호를 입력해주세요.");
-        }
-        if (scheduleUpdateRequestDto.getName() == null && scheduleUpdateRequestDto.getTitle() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 수정할 항목이 없습니다.");
-        }
-        if(scheduleUpdateRequestDto.getName() != null && scheduleUpdateRequestDto.getName().length() > 20){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 작성자명은 최대 20자까지 입력 가능합니다.");
-        }
         if(scheduleUpdateRequestDto.getTitle() != null && scheduleUpdateRequestDto.getTitle().length() > 30){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목은 최대 30자까지 입력 가능합니다.");
         }
     }
 
-    /**
-     * 비밀번호 일치 검증
-     * @throws ResponseStatusException 유효하지 않은 경우 401 반환
-     */
-    private void validatePassword(Schedule schedule, String password, String action) {
-        if (!schedule.getPassword().equals(password)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "일정 "+action+" 실패: 비밀번호가 일치하지 않습니다.");
-        }
-    }
+//    /**
+//     * 비밀번호 일치 검증
+//     * @throws ResponseStatusException 유효하지 않은 경우 401 반환
+//     */
+//    private void validatePassword(Schedule schedule, String password, String action) {
+//        if (!schedule.getPassword().equals(password)) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "일정 "+action+" 실패: 비밀번호가 일치하지 않습니다.");
+//        }
+//    }
 
 }
