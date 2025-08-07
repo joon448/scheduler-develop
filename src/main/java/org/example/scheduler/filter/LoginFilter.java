@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @Slf4j
 public class LoginFilter implements Filter {
-    private static final String[] WHITE_LIST = {"/", "/signup", "/login", "/logout"};
+    private static final String[] WHITE_LIST = {"/signup", "/login", "/logout"};
 
 
     @Override
@@ -24,6 +24,8 @@ public class LoginFilter implements Filter {
         if(!isWhiteList(requestURI)){
             HttpSession httpSession = httpRequest.getSession(false);
             if(httpSession == null || httpSession.getAttribute("userId")==null){
+                httpResponse.setCharacterEncoding("UTF-8");
+                httpResponse.setContentType("text/plain;charset=UTF-8");
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.getWriter().write("로그인 후 이용 가능합니다.");
                 return;
