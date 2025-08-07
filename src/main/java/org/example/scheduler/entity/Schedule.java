@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /*
  * 일정 Entity
@@ -18,8 +19,13 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // 일정 ID (자동 생성)
 
-    @Column(nullable = false, length = 20)
-    private String name;    // 작성자명
+    // @Column(nullable = false, length = 20)
+    // private String name;    // 작성자명
+
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     @Column(nullable = false, length = 50)
     private String password;    // 비밀번호
@@ -30,8 +36,7 @@ public class Schedule extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String content;     // 내용
 
-    public Schedule(String name, String password, String title, String content) {
-        this.name = name;
+    public Schedule(String password, String title, String content) {
         this.password = password;
         this.title = title;
         this.content = content;
@@ -44,14 +49,5 @@ public class Schedule extends BaseEntity {
      */
     public void updateTitle(String title) {
         this.title = title;
-    }
-
-    /*
-     * 작성자명을 수정합니다.
-     *
-     * @param name 수정할 작성자명
-     */
-    public void updateName(String name){
-        this.name = name;
     }
 }
