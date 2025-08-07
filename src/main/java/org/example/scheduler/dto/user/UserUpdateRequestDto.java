@@ -9,4 +9,6 @@ import lombok.Getter;
 public class UserUpdateRequestDto {
     private String name;    // 유저명
     private String email;   // 이메일
+    private String password; // 기존 비밀번호
+    private String newPassword; // 새 비밀번호
 }

@@ -1,6 +1,7 @@
 package org.example.scheduler.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.scheduler.dto.schedule.ScheduleRequestDto;
 import org.example.scheduler.dto.user.UserDeleteRequestDto;
 import org.example.scheduler.dto.user.UserRequestDto;
 import org.example.scheduler.dto.user.UserResponseDto;
@@ -8,8 +9,10 @@ import org.example.scheduler.dto.user.UserUpdateRequestDto;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +37,8 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto saveUser(UserRequestDto userRequestDto){
-        User user = new User(userRequestDto.getName(), userRequestDto.getEmail());
+        validateUserRequest(userRequestDto);
+        User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), userRequestDto.getPassword());
 
         userRepository.save(user);
         return new UserResponseDto(user);
@@ -76,6 +80,9 @@ public class UserService {
     @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findByIdOrElseThrow(id);
+        validateUserUpdateRequest(userUpdateRequestDto);
+        validatePasswordMatch(userUpdateRequestDto.getPassword(), user.getPassword());
+
 
         if(userUpdateRequestDto.getName()!=null){
             user.updateName(userUpdateRequestDto.getName());
@@ -83,6 +90,10 @@ public class UserService {
 
         if(userUpdateRequestDto.getEmail()!=null){
             user.updateEmail(userUpdateRequestDto.getEmail());
+        }
+
+        if(userUpdateRequestDto.getNewPassword()!=null){
+            user.updatePassword(userUpdateRequestDto.getNewPassword());
         }
 
         userRepository.flush(); // 반환 user에 modifiedAt 반영되도록 flush
@@ -98,11 +109,58 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id, UserDeleteRequestDto userDeleteRequestDto) {
         User user = userRepository.findByIdOrElseThrow(id);
-
+        validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
         scheduleRepository.deleteByUserId(id); // 해당 유저의 일정 먼저 삭제
         userRepository.delete(user);
     }
 
+    /**
+     * 유저 생성 요청 데이터 검증
+     * - 작성자명, 비밀번호, 제목, 내용 필수값 확인
+     * - 작성자명: 최대 20자, 제목: 최대 30자, 내용: 최대 200자
+     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
+     */
+    private void validateUserRequest(UserRequestDto userRequestDto) {
+        if (userRequestDto.getName() == null || userRequestDto.getName().trim().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이름을 입력해주세요.");
+        }
+        if (userRequestDto.getEmail() == null || userRequestDto.getEmail().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요.");
+        }
+        if (userRequestDto.getPassword() == null || userRequestDto.getPassword().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요.");
+        }
+    }
+    /**
+     * 유저 생성 요청 데이터 검증
+     * - 작성자명, 비밀번호, 제목, 내용 필수값 확인
+     * - 작성자명: 최대 20자, 제목: 최대 30자, 내용: 최대 200자
+     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
+     */
+    private void validateUserUpdateRequest(UserUpdateRequestDto userUpdateRequestDto) {
+        if (userUpdateRequestDto.getPassword() == null || userUpdateRequestDto.getPassword().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "기존 비밀번호를 입력해주세요.");
+        }
+        if (userUpdateRequestDto.getName() != null && userUpdateRequestDto.getName().trim().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이름을 입력해주세요.");
+        }
+        if (userUpdateRequestDto.getEmail() != null && userUpdateRequestDto.getEmail().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요.");
+        }
+        if (userUpdateRequestDto.getNewPassword() != null && userUpdateRequestDto.getNewPassword().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "새 비밀번호를 입력해주세요.");
+        }
 
+    }
+
+    /**
+     * 비밀번호 일치 검증
+     * @throws ResponseStatusException 유효하지 않은 경우 401 반환
+     */
+    private void validatePasswordMatch (String inputPassword, String storedPassword) {
+        if (!inputPassword.equals(storedPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+    }
 
 }

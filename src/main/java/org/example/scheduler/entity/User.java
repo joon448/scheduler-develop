@@ -22,9 +22,12 @@ public class User extends BaseEntity {
 
     private String email;    // 이메일
 
-    public User(String name, String email) {
+    private String password;    // 비밀번호
+    
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public void updateEmail(String email) {
@@ -33,5 +36,9 @@ public class User extends BaseEntity {
 
     public void updateName(String name) {
         this.name = name;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 }

@@ -9,4 +9,5 @@ import lombok.Getter;
 public class UserRequestDto {
     private String name;    // 유저명
     private String email;   // 이메일
+    private String password;
 }
