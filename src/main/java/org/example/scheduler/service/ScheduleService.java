@@ -1,5 +1,6 @@
 package org.example.scheduler.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.schedule.*;
 import org.example.scheduler.entity.Schedule;
@@ -35,10 +36,9 @@ public class ScheduleService {
      * @return 생성된 일정 응답 DTO
      */
     @Transactional
-    public ScheduleResponseDto saveSchedule(ScheduleRequestDto scheduleRequestDto){
+    public ScheduleResponseDto saveSchedule(ScheduleRequestDto scheduleRequestDto, Long userId) {
         validateScheduleRequest(scheduleRequestDto, "등록");
-
-        User user = userRepository.findByIdOrElseThrow(scheduleRequestDto.getUserId());
+        User user = userRepository.findByIdOrElseThrow(userId);
 
         Schedule schedule = new Schedule(scheduleRequestDto.getTitle(), scheduleRequestDto.getContent());
         schedule.setUser(user);
@@ -115,14 +115,13 @@ public class ScheduleService {
      * @return 수정된 일정 정보 응답 DTO
      */
     @Transactional
-    public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto scheduleUpdateRequestDto, Long sessionUserId) {
         //validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
-        //validatePassword(schedule, scheduleUpdateRequestDto.getPassword(), "수정");
+        if(!schedule.getUser().getId().equals(sessionUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 수정할 수 있습니다.");
+        }
 
-//        if(scheduleUpdateRequestDto.getName()!=null){
-//            schedule.updateName(scheduleUpdateRequestDto.getName());
-//        }
         if(scheduleUpdateRequestDto.getTitle()!=null){
             schedule.updateTitle(scheduleUpdateRequestDto.getTitle());
         }
@@ -137,8 +136,12 @@ public class ScheduleService {
      * @param id 일정 ID
      */
     @Transactional
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Long id, Long sessionUserId) {
+
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+        if(!schedule.getUser().getId().equals(sessionUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 삭제할 수 있습니다.");
+        }
         //validatePassword(schedule, scheduleDeleteRequestDto.getPassword(), "삭제");
 
         // commentRepository.deleteByScheduleId(id);
@@ -153,9 +156,6 @@ public class ScheduleService {
      * @throws ResponseStatusException 유효하지 않은 경우 400 반환
      */
     private void validateScheduleRequest(ScheduleRequestDto scheduleRequestDto, String action) {
-        if (scheduleRequestDto.getUserId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 유저 ID를 입력해주세요.");
-        }
         if (scheduleRequestDto.getTitle() == null || scheduleRequestDto.getTitle().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목을 입력해주세요.");
         }
