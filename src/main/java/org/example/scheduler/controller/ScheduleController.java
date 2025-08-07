@@ -6,6 +6,8 @@ import org.example.scheduler.dto.comment.CommentResponseDto;
 import org.example.scheduler.dto.schedule.*;
 import org.example.scheduler.service.CommentService;
 import org.example.scheduler.service.ScheduleService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +25,8 @@ public class ScheduleController {
      * @return 생성된 일정 정보
      */
     @PostMapping("/schedules")
-    public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto scheduleRequestDto) {
-        return scheduleService.saveSchedule(scheduleRequestDto);
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto scheduleRequestDto) {
+        return new ResponseEntity<>(scheduleService.saveSchedule(scheduleRequestDto), HttpStatus.CREATED);
     }
 
     /**
@@ -34,11 +36,11 @@ public class ScheduleController {
      * @return 일정 목록 (최신 수정일 기준 정렬)
      */
     @GetMapping("/schedules")
-    public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@RequestParam(required = false) String name) {
         if (name == null) {
-            return scheduleService.getAllSchedules();
+            return new ResponseEntity<>(scheduleService.getAllSchedules(),  HttpStatus.OK);
         }
-        return scheduleService.getSchedulesByName(name);
+        return new ResponseEntity<>(scheduleService.getSchedulesByName(name), HttpStatus.OK);
     }
 
     /**
@@ -47,9 +49,20 @@ public class ScheduleController {
      * @param id 일정 ID
      * @return 일정 + 댓글 정보
      */
+//    @GetMapping("/schedules/{id}")
+//    public ResponseEntity<ScheduleWithCommentsResponseDto> getScheduleWithComments(@PathVariable Long id) {
+//        return new ResponseEntity<>(scheduleService.getScheduleWithCommentsById(id), HttpStatus.OK);
+//    }
+
+    /**
+     * 특정 ID의 일정 조회
+     *
+     * @param id 일정 ID
+     * @return 일정
+     */
     @GetMapping("/schedules/{id}")
-    public ScheduleWithCommentsResponseDto getScheduleWithComments(@PathVariable Long id) {
-        return scheduleService.getScheduleWithCommentsById(id);
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long id) {
+        return new ResponseEntity<>(scheduleService.getScheduleById(id), HttpStatus.OK);
     }
 
     /**
@@ -60,8 +73,8 @@ public class ScheduleController {
      * @return 수정된 일정 정보
      */
     @PatchMapping("/schedules/{id}")
-    public ScheduleResponseDto updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
-        return scheduleService.updateSchedule(id, scheduleUpdateRequestDto);
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
+        return new ResponseEntity<>(scheduleService.updateSchedule(id, scheduleUpdateRequestDto),  HttpStatus.OK);
 
     }
 
@@ -72,20 +85,21 @@ public class ScheduleController {
      * @param scheduleDeleteRequestDto 삭제 요청 정보 (비밀번호)
      */
     @DeleteMapping("/schedules/{id}")
-    public void deleteSchedule(@PathVariable Long id, @RequestBody ScheduleDeleteRequestDto scheduleDeleteRequestDto) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, @RequestBody ScheduleDeleteRequestDto scheduleDeleteRequestDto) {
         scheduleService.deleteSchedule(id, scheduleDeleteRequestDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * 특정 ID의 일정에 댓글 등록
-     *
-     * @param scheduleId 일정 ID
-     * @param commentRequestDto 댓글 생성 요청 정보
-     * @return 생성된 댓글 정보
-     */
-    @PostMapping("/schedules/{scheduleId}/comments")
-    public CommentResponseDto createComment(@PathVariable Long scheduleId, @RequestBody CommentRequestDto commentRequestDto){
-        return commentService.saveComment(commentRequestDto, scheduleId);
-    }
+//    /**
+//     * 특정 ID의 일정에 댓글 등록
+//     *
+//     * @param scheduleId 일정 ID
+//     * @param commentRequestDto 댓글 생성 요청 정보
+//     * @return 생성된 댓글 정보
+//     */
+//    @PostMapping("/schedules/{scheduleId}/comments")
+//    public CommentResponseDto createComment(@PathVariable Long scheduleId, @RequestBody CommentRequestDto commentRequestDto){
+//        return commentService.saveComment(commentRequestDto, scheduleId);
+//    }
 
 }

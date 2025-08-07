@@ -73,7 +73,7 @@ public class ScheduleService {
     }
 
     /**
-     * 특정 일정 조회
+     * 특정 일정 및 댓글 조회
      *
      * @param id 일정 ID
      * @return 특정 일정 + 댓글 목록 응답 DTO (최신 수정일 순 정렬)
@@ -89,6 +89,18 @@ public class ScheduleService {
                 .collect(Collectors.toList());
 
         return new ScheduleWithCommentsResponseDto(new ScheduleResponseDto(schedule), comments);
+    }
+
+    /**
+     * 특정 일정 조회
+     *
+     * @param id 일정 ID
+     * @return 특정 일정 + 댓글 목록 응답 DTO (최신 수정일 순 정렬)
+     */
+    @Transactional(readOnly = true)
+    public ScheduleResponseDto getScheduleById(Long id) {
+        Schedule schedule = getScheduleOrThrow(id, "조회");
+        return new ScheduleResponseDto(schedule);
     }
 
     /**
