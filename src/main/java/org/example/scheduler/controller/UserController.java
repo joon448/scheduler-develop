@@ -1,6 +1,7 @@
 package org.example.scheduler.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.login.LoginRequestDto;
@@ -82,8 +83,18 @@ public class UserController {
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
         userService.login(loginRequestDto, request);
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 
 //    /**
 //     * 특정 ID의 일정에 댓글 등록
