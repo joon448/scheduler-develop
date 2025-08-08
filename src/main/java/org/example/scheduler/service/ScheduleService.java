@@ -128,6 +128,10 @@ public class ScheduleService {
             schedule.updateTitle(scheduleUpdateRequestDto.getTitle());
         }
 
+        if(scheduleUpdateRequestDto.getContent()!=null){
+            schedule.updateContent(scheduleUpdateRequestDto.getContent());
+        }
+
         scheduleRepository.flush(); // 반환 schedule에 modifiedAt 반영되도록 flush
         return new ScheduleResponseDto(schedule);
     }
