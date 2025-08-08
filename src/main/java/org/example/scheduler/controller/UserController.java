@@ -76,8 +76,10 @@ public class UserController {
      */
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto, HttpServletRequest httpRequest) {
-        Long userId = (Long) httpRequest.getSession().getAttribute("userId");
+        HttpSession session = httpRequest.getSession(false);
+        Long userId = (Long) session.getAttribute("userId");
         userService.deleteUser(id, userDeleteRequestDto, userId);
+        session.invalidate(); // 유저 삭제 시 세션 종료
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -125,7 +125,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-
+    @Transactional(readOnly = true)
     public void login(LoginRequestDto loginRequestDto, HttpServletRequest request) {
         User user = userRepository.findByEmailOrElseThrow(loginRequestDto.getEmail());
 

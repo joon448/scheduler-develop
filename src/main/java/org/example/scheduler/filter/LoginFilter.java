@@ -5,14 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.example.scheduler.repository.UserRepository;
 import org.springframework.util.PatternMatchUtils;
 
 import java.io.IOException;
 
 @Slf4j
 public class LoginFilter implements Filter {
-    private static final String[] WHITE_LIST = {"/signup", "/login", "/logout"};
-
+    private static final String[] WHITE_LIST = {"/", "/signup", "/login", "/logout"};
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -23,11 +23,15 @@ public class LoginFilter implements Filter {
         log.info("로그인 필터 로직 실행");
         if(!isWhiteList(requestURI)){
             HttpSession httpSession = httpRequest.getSession(false);
-            if(httpSession == null || httpSession.getAttribute("userId")==null){
+            Long userId = (httpSession == null) ? null : (Long) httpSession.getAttribute("userId");
+            if(userId == null){
+                if(httpSession != null){
+                    httpSession.invalidate();
+                }
                 httpResponse.setCharacterEncoding("UTF-8");
-                httpResponse.setContentType("text/plain;charset=UTF-8");
+                httpResponse.setContentType("text/json;charset=UTF-8");
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.getWriter().write("로그인 후 이용 가능합니다.");
+                httpResponse.getWriter().write("{\"message\":\"로그인 후 이용 가능합니다.\"}");
                 return;
             }
         }
