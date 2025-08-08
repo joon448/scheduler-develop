@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/schedules/{scheduleId}/comments")
 public class CommentController {
     private final CommentService commentService;
 
@@ -26,7 +25,7 @@ public class CommentController {
      * @param commentRequestDto 댓글 생성 요청 정보
      * @return 생성된 댓글 정보
      */
-    @PostMapping("/")
+    @PostMapping("/schedules/{scheduleId}/comments")
     public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long scheduleId, @Valid @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest httpRequest){
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
         return new ResponseEntity<>(commentService.addCommentToSchedule(commentRequestDto, scheduleId, userId),  HttpStatus.CREATED);
@@ -38,7 +37,7 @@ public class CommentController {
      * @param scheduleId 일정 ID
      * @return 댓글 목록 (최신 수정일 기준 정렬)
      */
-    @GetMapping("/")
+    @GetMapping("/schedules/{scheduleId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long scheduleId) {
         return new ResponseEntity<>(commentService.getCommentsByScheduleId(scheduleId),  HttpStatus.OK);
     }
@@ -50,7 +49,7 @@ public class CommentController {
      * @param commentId 댓글 ID
      * @return 댓글
      */
-    @GetMapping("/{commentId}")
+    @GetMapping("/schedules/{scheduleId}/comments/{commentId}")
     public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long scheduleId, @PathVariable Long commentId) {
         return new ResponseEntity<>(commentService.getCommentById(scheduleId, commentId), HttpStatus.OK);
     }
@@ -63,7 +62,7 @@ public class CommentController {
      * @param commentUpdateRequestDto 댓글 수정 요청 정보
      * @return 수정된 댓글 정보
      */
-    @PatchMapping("/{commentId}")
+    @PatchMapping("/schedules/{scheduleId}/comments/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long scheduleId, @PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDto commentUpdateRequestDto, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
         return new ResponseEntity<>(commentService.updateComment(scheduleId, commentId, userId, commentUpdateRequestDto),  HttpStatus.OK);
@@ -75,7 +74,7 @@ public class CommentController {
      * @param scheduleId 일정 ID
      * @param commentId 댓글 ID
      */
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/schedules/{scheduleId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long scheduleId, @PathVariable Long commentId, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
         commentService.deleteComment(scheduleId, commentId, userId);

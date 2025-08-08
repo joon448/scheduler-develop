@@ -1,8 +1,11 @@
 package org.example.scheduler.repository;
 
+import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.entity.Comment;
+import org.example.scheduler.error.CustomException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,4 +37,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long>{
     void deleteByScheduleId(Long scheduleId);
 
     void deleteByUserId(Long userId);
+
+    List<Comment> findByScheduleIdOrderByModifiedAtDesc(Long scheduleId);
+
+    default Comment findByIdOrElseThrow(Long commentId){
+        return findById(commentId).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+    }
 }

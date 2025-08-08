@@ -20,7 +20,8 @@ public enum ErrorCode {
 
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCH-404", "존재하지 않는 일정입니다."),
 
-    COMMENT_LIMIT_EXCEED(HttpStatus.BAD_REQUEST, "CMT-400","하나의 일정에 댓글은 최대 10개까지 등록할 수 있습니다.");
+    COMMENT_SCHEDULE_MISMATCH(HttpStatus.BAD_REQUEST, "CMT-400", "댓글이 요청한 일정에 속하지 않습니다."),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CMT-404", "존재하지 않는 댓글입니다.");
 
     private final HttpStatus status;
     private final String code;
