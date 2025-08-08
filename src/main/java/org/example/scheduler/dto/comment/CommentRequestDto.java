@@ -1,5 +1,7 @@
 package org.example.scheduler.dto.comment;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 /**
@@ -7,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public class CommentRequestDto {
-    private String name;        // 작성자명
-    private String password;    // 비밀번호
+    @NotBlank
+    @Size(min = 1, max = 100)
     private String content;     // 내용
 }

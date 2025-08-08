@@ -1,5 +1,6 @@
 package org.example.scheduler.dto.user;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 /**
@@ -7,5 +8,6 @@ import lombok.Getter;
  */
 @Getter
 public class UserDeleteRequestDto {
+    @NotBlank
     private String password;    // 비밀번호
 }

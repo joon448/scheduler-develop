@@ -1,5 +1,7 @@
 package org.example.scheduler.dto.schedule;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 /**
@@ -7,5 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public class ScheduleUpdateRequestDto {
+    @NotBlank
+    @Size(min = 1, max = 30)
     private String title;       // 제목
 }
