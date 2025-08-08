@@ -37,7 +37,7 @@ public class CommentService {
      * @return 생성된 댓글 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional
-    public CommentResponseDto addCommentToSchedule(CommentRequestDto commentRequestDto, Long userId, Long scheduleId){
+    public CommentResponseDto addCommentToSchedule(CommentRequestDto commentRequestDto, Long scheduleId, Long userId){
         User user = userRepository.findByIdOrElseThrow(userId);
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
 

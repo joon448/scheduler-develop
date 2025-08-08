@@ -99,26 +99,26 @@ public class ScheduleService {
     /**
      * 특정 일정 조회
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      * @return 특정 일정 + 댓글 목록 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional(readOnly = true)
-    public ScheduleResponseDto getScheduleById(Long id) {
-        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+    public ScheduleResponseDto getScheduleById(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
         return new ScheduleResponseDto(schedule);
     }
 
     /**
      * 특정 일정 수정
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      * @param scheduleUpdateRequestDto 일정 수정 요청 데이터
      * @return 수정된 일정 정보 응답 DTO
      */
     @Transactional
-    public ScheduleResponseDto updateSchedule(Long id, Long sessionUserId, ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
+    public ScheduleResponseDto updateSchedule(Long scheduleId, Long sessionUserId, ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
         //validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
-        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
         if(!schedule.getUser().getId().equals(sessionUserId)){
             //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 수정할 수 있습니다.");
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 수정할 수 있습니다.");
@@ -139,12 +139,12 @@ public class ScheduleService {
     /**
      * 특정 일정 및 관련 댓글 삭제
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      */
     @Transactional
-    public void deleteSchedule(Long id, Long sessionUserId) {
+    public void deleteSchedule(Long scheduleId, Long sessionUserId) {
 
-        Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
         if(!schedule.getUser().getId().equals(sessionUserId)){
             //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 삭제할 수 있습니다.");
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 삭제할 수 있습니다.");

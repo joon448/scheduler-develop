@@ -17,10 +17,10 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
     List<Schedule> findByUserIdOrderByModifiedAtDesc(Long userId);
 
-    void deleteByUserId(Long id);
+    void deleteByUserId(Long userId);
 
-    default Schedule findByIdOrElseThrow(Long id){
-        return findById(id).orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_NOT_FOUND));
+    default Schedule findByIdOrElseThrow(Long scheduleId){
+        return findById(scheduleId).orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_NOT_FOUND));
     }
 
 

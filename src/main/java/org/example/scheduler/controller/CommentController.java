@@ -29,7 +29,7 @@ public class CommentController {
     @PostMapping("/")
     public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long scheduleId, @Valid @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest httpRequest){
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
-        return new ResponseEntity<>(commentService.addCommentToSchedule(commentRequestDto, userId, scheduleId),  HttpStatus.CREATED);
+        return new ResponseEntity<>(commentService.addCommentToSchedule(commentRequestDto, scheduleId, userId),  HttpStatus.CREATED);
     }
 
     /**

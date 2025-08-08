@@ -12,6 +12,7 @@ import org.example.scheduler.dto.user.UserUpdateRequestDto;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
 import org.example.scheduler.error.ErrorCode;
+import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CommentRepository commentRepository;
 
     /**
      * 유저 생성
@@ -73,25 +75,25 @@ public class UserService {
     /**
      * 유저 아이디로 유저 조회
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @return 특정 유저의 정보 응답 DTO
      */
     @Transactional(readOnly = true)
-    public UserResponseDto getUserById(Long id) {
-        User user = userRepository.findByIdOrElseThrow(id);
+    public UserResponseDto getUserById(Long userId) {
+        User user = userRepository.findByIdOrElseThrow(userId);
         return new UserResponseDto(user);
     }
 
     /**
      * 특정 유저 수정
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @param userUpdateRequestDto 유저 수정 요청 데이터
      * @return 수정된 유저 정보 응답 DTO
      */
     @Transactional
-    public UserResponseDto updateUser(Long id, UserUpdateRequestDto userUpdateRequestDto, Long sessionUserId) {
-        User user = userRepository.findByIdOrElseThrow(id);
+    public UserResponseDto updateUser(Long userId, Long sessionUserId, UserUpdateRequestDto userUpdateRequestDto) {
+        User user = userRepository.findByIdOrElseThrow(userId);
         if(!user.getId().equals(sessionUserId)){
 
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인의 정보만 수정할 수 있습니다.");
@@ -128,18 +130,19 @@ public class UserService {
     /**
      * 특정 유저 삭제
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @param userDeleteRequestDto 유저 삭제 요청 데이터
      */
     @Transactional
-    public void deleteUser(Long id, UserDeleteRequestDto userDeleteRequestDto,  Long sessionUserId) {
-        User user = userRepository.findByIdOrElseThrow(id);
+    public void deleteUser(Long userId,  Long sessionUserId, UserDeleteRequestDto userDeleteRequestDto) {
+        User user = userRepository.findByIdOrElseThrow(userId);
         if(!user.getId().equals(sessionUserId)){
             //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 삭제할 수 있습니다.");
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인만 삭제할 수 있습니다.");
         }
         validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
-        scheduleRepository.deleteByUserId(id); // 해당 유저의 일정 먼저 삭제
+        commentRepository.deleteByUserId(userId); // 해당 유저의 댓글 먼저 삭제
+        scheduleRepository.deleteByUserId(userId); // 해당 유저의 일정 먼저 삭제
         userRepository.delete(user);
     }
 

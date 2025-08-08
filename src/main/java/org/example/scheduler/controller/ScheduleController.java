@@ -56,37 +56,37 @@ public class ScheduleController {
     /**
      * 특정 ID의 일정 조회
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      * @return 일정
      */
-    @GetMapping("/schedules/{id}")
-    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long id) {
-        return new ResponseEntity<>(scheduleService.getScheduleById(id), HttpStatus.OK);
+    @GetMapping("/schedules/{scheduleId}")
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long scheduleId) {
+        return new ResponseEntity<>(scheduleService.getScheduleById(scheduleId), HttpStatus.OK);
     }
 
     /**
      * 특정 ID의 일정 수정
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      * @param scheduleUpdateRequestDto 일정 수정 요청 정보
      * @return 수정된 일정 정보
      */
-    @PatchMapping("/schedules/{id}")
-    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto, HttpServletRequest httpRequest) {
+    @PatchMapping("/schedules/{scheduleId}")
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
-        return new ResponseEntity<>(scheduleService.updateSchedule(id, userId, scheduleUpdateRequestDto),  HttpStatus.OK);
+        return new ResponseEntity<>(scheduleService.updateSchedule(scheduleId, userId, scheduleUpdateRequestDto),  HttpStatus.OK);
 
     }
 
     /**
      * 특정 ID의 일정 삭제
      *
-     * @param id 일정 ID
+     * @param scheduleId 일정 ID
      */
-    @DeleteMapping("/schedules/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id, HttpServletRequest httpRequest) {
+    @DeleteMapping("/schedules/{scheduleId}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
-        scheduleService.deleteSchedule(id, userId);
+        scheduleService.deleteSchedule(scheduleId, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -46,39 +46,39 @@ public class UserController {
     /**
      * 특정 ID의 유저 조회
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @return 유저
      */
-    @GetMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable Long userId) {
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
     /**
      * 특정 ID의 유저 수정
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @param userUpdateRequestDto 유저 수정 요청 정보
      * @return 수정된 유저 정보
      */
-    @PatchMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto, HttpServletRequest httpRequest) {
-        Long userId = (Long) httpRequest.getSession().getAttribute("userId");
-        return new ResponseEntity<>(userService.updateUser(id, userUpdateRequestDto, userId),  HttpStatus.OK);
+    @PatchMapping("/users/{userId}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto, HttpServletRequest httpRequest) {
+        Long sessionUserId = (Long) httpRequest.getSession().getAttribute("userId");
+        return new ResponseEntity<>(userService.updateUser(userId, sessionUserId, userUpdateRequestDto),  HttpStatus.OK);
 
     }
 
     /**
      * 특정 ID의 유저 삭제
      *
-     * @param id 유저 ID
+     * @param userId 유저 ID
      * @param userDeleteRequestDto 삭제 요청 정보 (비밀번호)
      */
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto, HttpServletRequest httpRequest) {
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto, HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
-        Long userId = (Long) session.getAttribute("userId");
-        userService.deleteUser(id, userDeleteRequestDto, userId);
+        Long sessionUserId = (Long) session.getAttribute("userId");
+        userService.deleteUser(userId, sessionUserId, userDeleteRequestDto);
         session.invalidate(); // 유저 삭제 시 세션 종료
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
