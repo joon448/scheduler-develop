@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService scheduleService;
-    // private final CommentService commentService;
+    private final CommentService commentService;
 
     /**
      * 새로운 일정 등록
@@ -90,16 +90,6 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    /**
-//     * 특정 ID의 일정에 댓글 등록
-//     *
-//     * @param scheduleId 일정 ID
-//     * @param commentRequestDto 댓글 생성 요청 정보
-//     * @return 생성된 댓글 정보
-//     */
-//    @PostMapping("/schedules/{scheduleId}/comments")
-//    public CommentResponseDto createComment(@PathVariable Long scheduleId, @RequestBody CommentRequestDto commentRequestDto){
-//        return commentService.saveComment(commentRequestDto, scheduleId);
-//    }
+
 
 }

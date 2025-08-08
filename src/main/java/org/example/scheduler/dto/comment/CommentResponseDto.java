@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
  */
 @Getter
 public class CommentResponseDto {
-    private final Long id;                 //  댓글 ID
-    private final Long userId;        // 내용
-    private final Long scheduleId;
-    private final String content;           // 일정 ID
+    private final Long id;                  // 댓글 ID
+    private final Long userId;              // 유저 ID
+    private final Long scheduleId;          // 일정 ID
+    private final String content;           // 내용
     private final LocalDateTime createdAt;  // 작성일
     private final LocalDateTime modifiedAt; // 수정일
 

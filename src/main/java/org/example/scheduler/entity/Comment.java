@@ -32,7 +32,7 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String content;     // 내용
 
-    public Comment(String content, Long scheduleId) {
+    public Comment(String content) {
         this.content = content;
     }
 

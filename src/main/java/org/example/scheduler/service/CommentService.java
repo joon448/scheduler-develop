@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.comment.CommentRequestDto;
 import org.example.scheduler.dto.comment.CommentResponseDto;
 import org.example.scheduler.entity.Comment;
+import org.example.scheduler.entity.Schedule;
+import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
 import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
+import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
 
     /**
      * 댓글 저장
@@ -30,23 +34,18 @@ public class CommentService {
      * @return 생성된 댓글 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional
-    public CommentResponseDto saveComment(CommentRequestDto commentRequestDto, Long scheduleId){
-        validateScheduleExists(scheduleId);
+    public CommentResponseDto saveComment(CommentRequestDto commentRequestDto, Long userId, Long scheduleId){
+        User user = userRepository.findByIdOrElseThrow(userId);
+        Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
+
         validateCommentLimit(scheduleId);
-        Comment comment = new Comment(commentRequestDto.getContent(), scheduleId);
+
+        Comment comment = new Comment(commentRequestDto.getContent());
+        comment.setUser(user);
+        comment.setSchedule(schedule);
 
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
-    }
-
-    /**
-     * 유효한 일정 ID 검증
-     * @throws ResponseStatusException 유효하지 않은 경우 404 반환
-     */
-    private void validateScheduleExists(Long scheduleId) {
-        if(!scheduleRepository.existsById(scheduleId)){
-            throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
-        }
     }
 
     /**

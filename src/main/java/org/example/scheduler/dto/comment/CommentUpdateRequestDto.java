@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 /**
- * 댓글 생성 요청 시 전달받는 DTO
+ * 댓글 수정 요청 시 전달받는 DTO
  */
 @Getter
 public class CommentUpdateRequestDto {
