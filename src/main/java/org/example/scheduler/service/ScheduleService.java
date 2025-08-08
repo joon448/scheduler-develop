@@ -1,8 +1,9 @@
 package org.example.scheduler.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.example.scheduler.dto.schedule.*;
+import org.example.scheduler.dto.schedule.ScheduleRequestDto;
+import org.example.scheduler.dto.schedule.ScheduleResponseDto;
+import org.example.scheduler.dto.schedule.ScheduleUpdateRequestDto;
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
@@ -10,12 +11,9 @@ import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;

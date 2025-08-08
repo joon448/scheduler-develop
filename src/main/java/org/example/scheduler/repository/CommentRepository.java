@@ -1,11 +1,10 @@
 package org.example.scheduler.repository;
 
-import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.entity.Comment;
 import org.example.scheduler.error.CustomException;
+import org.example.scheduler.error.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

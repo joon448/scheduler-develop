@@ -1,17 +1,10 @@
 package org.example.scheduler.repository;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
 import org.example.scheduler.error.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 /**

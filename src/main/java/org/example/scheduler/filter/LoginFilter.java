@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.example.scheduler.repository.UserRepository;
 import org.springframework.util.PatternMatchUtils;
 
 import java.io.IOException;
