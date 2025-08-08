@@ -128,7 +128,7 @@ public class UserService {
     }
 
     /**
-     * 특정 유저 삭제
+     * 특정 유저 및 관련 일정, 댓글 삭제
      *
      * @param userId 유저 ID
      * @param userDeleteRequestDto 유저 삭제 요청 데이터

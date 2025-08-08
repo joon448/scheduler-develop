@@ -7,6 +7,7 @@ import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
 import org.example.scheduler.error.ErrorCode;
+import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -22,13 +23,12 @@ import java.util.stream.Collectors;
 /**
  * 일정 관련 비즈니스 로직을 처리하는 서비스
  * - 일정 생성, 조회, 수정, 삭제 기능 제공
- * - 단일 일정 조회 시 댓글 목록도 함께 조회
  */
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
-    // private final CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
     /**
@@ -63,19 +63,19 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 작성자명으로 일정 조회
-     *
-     * @param userId 유저 ID
-     * @return 특정 작성자의 일정 목록 응답 DTO (최신 수정일 순 정렬)
-     */
-    @Transactional(readOnly = true)
-    public List<ScheduleResponseDto> getSchedulesByUserId(Long userId) {
-        return scheduleRepository.findByUserIdOrderByModifiedAtDesc(userId) // 최신 수정일 기준 내림차순 정렬
-                .stream()
-                .map(ScheduleResponseDto::new)
-                .collect(Collectors.toList());
-    }
+//    /**
+//     * 작성자명으로 일정 조회
+//     *
+//     * @param userId 유저 ID
+//     * @return 특정 작성자의 일정 목록 응답 DTO (최신 수정일 순 정렬)
+//     */
+//    @Transactional(readOnly = true)
+//    public List<ScheduleResponseDto> getSchedulesByUserId(Long userId) {
+//        return scheduleRepository.findByUserIdOrderByModifiedAtDesc(userId) // 최신 수정일 기준 내림차순 정렬
+//                .stream()
+//                .map(ScheduleResponseDto::new)
+//                .collect(Collectors.toList());
+//    }
 
 //    /**
 //     * 특정 일정 및 댓글 조회
@@ -150,7 +150,7 @@ public class ScheduleService {
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 삭제할 수 있습니다.");
         }
 
-        // commentRepository.deleteByScheduleId(id);
+        commentRepository.deleteByScheduleId(scheduleId);
         scheduleRepository.delete(schedule);
     }
 }
