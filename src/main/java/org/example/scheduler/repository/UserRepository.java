@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
+import org.example.scheduler.error.CustomException;
+import org.example.scheduler.error.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,13 +20,13 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>{
 
     default User findByIdOrElseThrow(Long userId){
-        return findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 유저 ID입니다."));
+        return findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     boolean existsByEmail(String email);
 
     default User findByEmailOrElseThrow(String email){
-        return findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 이메일입니다."));
+        return findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     Optional<User> findByEmail(String email);

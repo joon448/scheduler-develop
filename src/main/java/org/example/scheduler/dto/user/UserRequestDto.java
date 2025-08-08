@@ -10,12 +10,14 @@ import lombok.Getter;
  */
 @Getter
 public class UserRequestDto {
-    @NotBlank
-    @Size(min = 1, max = 20)
+    @NotBlank(message = "이름을 입력해주세요.")
+    @Size(min = 1, max = 20, message = "이름은 최대 20자까지 작성 가능합니다.")
     private String name;    // 유저명
-    @NotBlank
-    @Email
+
+    @NotBlank(message = "이메일을 입력해주세요.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;   // 이메일
-    @NotBlank
+
+    @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 }

@@ -9,6 +9,8 @@ import org.example.scheduler.dto.user.UserRequestDto;
 import org.example.scheduler.dto.user.UserResponseDto;
 import org.example.scheduler.dto.user.UserUpdateRequestDto;
 import org.example.scheduler.entity.User;
+import org.example.scheduler.error.CustomException;
+import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -41,7 +43,8 @@ public class UserService {
     public UserResponseDto saveUser(UserRequestDto userRequestDto){
 
         if (userRepository.existsByEmail(userRequestDto.getEmail())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
+            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
+            throw new CustomException(ErrorCode.DUPLICATE_USER);
         }
         User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), userRequestDto.getPassword());
 
@@ -86,7 +89,9 @@ public class UserService {
     public UserResponseDto updateUser(Long id, UserUpdateRequestDto userUpdateRequestDto, Long sessionUserId) {
         User user = userRepository.findByIdOrElseThrow(id);
         if(!user.getId().equals(sessionUserId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 정보만 수정할 수 있습니다.");
+
+            throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인의 정보만 수정할 수 있습니다.");
+            // throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 정보만 수정할 수 있습니다.");
         }
 
         validatePasswordMatch(userUpdateRequestDto.getPassword(), user.getPassword());
@@ -118,7 +123,8 @@ public class UserService {
     public void deleteUser(Long id, UserDeleteRequestDto userDeleteRequestDto,  Long sessionUserId) {
         User user = userRepository.findByIdOrElseThrow(id);
         if(!user.getId().equals(sessionUserId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 삭제할 수 있습니다.");
+            //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 삭제할 수 있습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인만 삭제할 수 있습니다.");
         }
         validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
         scheduleRepository.deleteByUserId(id); // 해당 유저의 일정 먼저 삭제
@@ -129,10 +135,7 @@ public class UserService {
     public void login(LoginRequestDto loginRequestDto, HttpServletRequest request) {
         User user = userRepository.findByEmailOrElseThrow(loginRequestDto.getEmail());
 
-        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
-
+        validatePasswordMatch(loginRequestDto.getPassword(), user.getPassword());
         request.getSession().setAttribute("userId", user.getId());
     }
 
@@ -142,7 +145,7 @@ public class UserService {
      */
     private void validatePasswordMatch (String inputPassword, String storedPassword) {
         if (!inputPassword.equals(storedPassword)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
         }
     }
 

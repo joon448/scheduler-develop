@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.schedule.*;
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
+import org.example.scheduler.error.CustomException;
+import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -118,7 +120,8 @@ public class ScheduleService {
         //validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
         if(!schedule.getUser().getId().equals(sessionUserId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 수정할 수 있습니다.");
+            //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 수정할 수 있습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 수정할 수 있습니다.");
         }
 
         if(scheduleUpdateRequestDto.getTitle()!=null){
@@ -139,23 +142,11 @@ public class ScheduleService {
 
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
         if(!schedule.getUser().getId().equals(sessionUserId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 삭제할 수 있습니다.");
+            //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 일정만 삭제할 수 있습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 삭제할 수 있습니다.");
         }
-        //validatePassword(schedule, scheduleDeleteRequestDto.getPassword(), "삭제");
 
         // commentRepository.deleteByScheduleId(id);
         scheduleRepository.delete(schedule);
     }
-
-
-//    /**
-//     * 비밀번호 일치 검증
-//     * @throws ResponseStatusException 유효하지 않은 경우 401 반환
-//     */
-//    private void validatePassword(Schedule schedule, String password, String action) {
-//        if (!schedule.getPassword().equals(password)) {
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "일정 "+action+" 실패: 비밀번호가 일치하지 않습니다.");
-//        }
-//    }
-
 }

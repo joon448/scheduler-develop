@@ -2,6 +2,8 @@ package org.example.scheduler.repository;
 
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
+import org.example.scheduler.error.CustomException;
+import org.example.scheduler.error.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,7 +20,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>{
     void deleteByUserId(Long id);
 
     default Schedule findByIdOrElseThrow(Long id){
-        return findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 일정 ID입니다."));
+        return findById(id).orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_NOT_FOUND));
     }
 
 
