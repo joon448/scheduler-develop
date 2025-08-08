@@ -32,7 +32,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, HttpServletRequest req) {
         ErrorCode code = ex.getErrorCode();
-        ErrorResponse body = ErrorResponse.of(code.getStatus(), code.getCode(), code.getMessage(), req.getRequestURI());
+        String message = (ex.getMessage() != null && !ex.getMessage().isBlank())
+                ? ex.getMessage()                 // ← 커스텀 메시지 우선
+                : code.getMessage();
+        ErrorResponse body = ErrorResponse.of(code.getStatus(), code.getCode(), message, req.getRequestURI());
         return ResponseEntity.status(code.getStatus()).body(body);
     }
 }

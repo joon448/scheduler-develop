@@ -115,7 +115,7 @@ public class UserService {
 
         if(userUpdateRequestDto.getNewPassword()!=null){
             if(passwordEncoder.matches(userUpdateRequestDto.getNewPassword(), user.getPassword())){
-                throw new CustomException(ErrorCode.VALIDATION_FAILED, "새 비밀번호가 기존 비밀번호와 같습니다.");
+                throw new CustomException(ErrorCode.PASSWORD_SAME_AS_OLD, "새 비밀번호가 기존 비밀번호와 같습니다.");
             }
             String newEncodedPassword = passwordEncoder.encode(userUpdateRequestDto.getNewPassword());
             user.updatePassword(newEncodedPassword);

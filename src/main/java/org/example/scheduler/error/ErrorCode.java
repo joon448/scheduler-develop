@@ -11,6 +11,7 @@ public enum ErrorCode {
 
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "VAL-001","유효성 검증에 실패했습니다."),
 
+    PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "AUTH-400","새 비밀번호가 기존 비밀번호와 동일합니다."),
     PASSWORD_INCORRECT(HttpStatus.UNAUTHORIZED, "AUTH-401", "비밀번호가 올바르지 않습니다."),
     FORBIDDEN_NOT_OWNER(HttpStatus.FORBIDDEN, "AUTH-403", "접근 권한이 없습니다."),
 
