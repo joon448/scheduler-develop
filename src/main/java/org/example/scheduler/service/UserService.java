@@ -2,6 +2,7 @@ package org.example.scheduler.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.example.scheduler.config.PasswordEncoder;
 import org.example.scheduler.dto.login.LoginRequestDto;
 import org.example.scheduler.dto.schedule.ScheduleRequestDto;
 import org.example.scheduler.dto.user.UserDeleteRequestDto;
@@ -32,6 +33,7 @@ public class UserService {
     //private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 유저 생성
@@ -46,7 +48,9 @@ public class UserService {
             // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
             throw new CustomException(ErrorCode.DUPLICATE_USER);
         }
-        User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), userRequestDto.getPassword());
+
+        String encodedPassword = passwordEncoder.encode(userRequestDto.getPassword());
+        User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), encodedPassword);
 
         userRepository.save(user);
         return new UserResponseDto(user);
@@ -94,6 +98,7 @@ public class UserService {
             // throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 정보만 수정할 수 있습니다.");
         }
 
+
         validatePasswordMatch(userUpdateRequestDto.getPassword(), user.getPassword());
 
 
@@ -102,11 +107,18 @@ public class UserService {
         }
 
         if(userUpdateRequestDto.getEmail()!=null){
+            if(userRepository.existsByEmail(userUpdateRequestDto.getEmail())){
+                throw new CustomException(ErrorCode.DUPLICATE_USER, "이미 사용 중인 이메일입니다.");
+            }
             user.updateEmail(userUpdateRequestDto.getEmail());
         }
 
         if(userUpdateRequestDto.getNewPassword()!=null){
-            user.updatePassword(userUpdateRequestDto.getNewPassword());
+            if(passwordEncoder.matches(userUpdateRequestDto.getNewPassword(), user.getPassword())){
+                throw new CustomException(ErrorCode.VALIDATION_FAILED, "새 비밀번호가 기존 비밀번호와 같습니다.");
+            }
+            String newEncodedPassword = passwordEncoder.encode(userUpdateRequestDto.getNewPassword());
+            user.updatePassword(newEncodedPassword);
         }
 
         userRepository.flush(); // 반환 user에 modifiedAt 반영되도록 flush
@@ -144,7 +156,7 @@ public class UserService {
      * @throws ResponseStatusException 유효하지 않은 경우 401 반환
      */
     private void validatePasswordMatch (String inputPassword, String storedPassword) {
-        if (!inputPassword.equals(storedPassword)) {
+        if (!passwordEncoder.matches(inputPassword, storedPassword)) {
             throw new CustomException(ErrorCode.PASSWORD_INCORRECT);
         }
     }
