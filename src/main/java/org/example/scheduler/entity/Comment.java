@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /*
  * 댓글 Entity
@@ -18,22 +19,24 @@ public class Comment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // 댓글 ID (자동 생성)
 
-    @Column(nullable = false, length = 20)
-    private String name;    // 작성자명
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
-    @Column(nullable = false, length = 50)
-    private String password;    // 비밀번호
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "scheduleId")
+    private Schedule schedule;
 
     @Column(nullable = false, length = 100)
     private String content;     // 내용
 
-    @Column(nullable = false)
-    private Long scheduleId;    // 일정 ID
-
-    public Comment(String name, String password, String content, Long scheduleId) {
-        this.name = name;
-        this.password = password;
+    public Comment(String content, Long scheduleId) {
         this.content = content;
-        this.scheduleId = scheduleId;
+    }
+
+    public void updateContent(String content){
+        this.content = content;
     }
 }

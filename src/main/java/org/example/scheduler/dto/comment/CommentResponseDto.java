@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
  */
 @Getter
 public class CommentResponseDto {
-    private final Long id;                  // 댓글 ID
-    private final String name;              // 작성자명
-    private final String content;           // 내용
-    private final Long scheduleId;          // 일정 ID
+    private final Long id;                 //  댓글 ID
+    private final Long userId;        // 내용
+    private final Long scheduleId;
+    private final String content;           // 일정 ID
     private final LocalDateTime createdAt;  // 작성일
     private final LocalDateTime modifiedAt; // 수정일
 
 
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
-        this.name = comment.getName();
+        this.userId = comment.getUser().getId();
+        this.scheduleId = comment.getSchedule().getId();
         this.content = comment.getContent();
-        this.scheduleId = comment.getScheduleId();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
     }
