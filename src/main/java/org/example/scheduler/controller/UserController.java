@@ -62,8 +62,9 @@ public class UserController {
      * @return 수정된 유저 정보
      */
     @PatchMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
-        return new ResponseEntity<>(userService.updateUser(id, userUpdateRequestDto),  HttpStatus.OK);
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto, HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getSession().getAttribute("userId");
+        return new ResponseEntity<>(userService.updateUser(id, userUpdateRequestDto, userId),  HttpStatus.OK);
 
     }
 
@@ -74,8 +75,9 @@ public class UserController {
      * @param userDeleteRequestDto 삭제 요청 정보 (비밀번호)
      */
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
-        userService.deleteUser(id, userDeleteRequestDto);
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto, HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getSession().getAttribute("userId");
+        userService.deleteUser(id, userDeleteRequestDto, userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -40,7 +40,6 @@ public class UserService {
     @Transactional
     public UserResponseDto saveUser(UserRequestDto userRequestDto){
 
-        validateUserRequest(userRequestDto);
         if (userRepository.existsByEmail(userRequestDto.getEmail())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
         }
@@ -84,9 +83,12 @@ public class UserService {
      * @return 수정된 유저 정보 응답 DTO
      */
     @Transactional
-    public UserResponseDto updateUser(Long id, UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponseDto updateUser(Long id, UserUpdateRequestDto userUpdateRequestDto, Long sessionUserId) {
         User user = userRepository.findByIdOrElseThrow(id);
-        validateUserUpdateRequest(userUpdateRequestDto);
+        if(!user.getId().equals(sessionUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 정보만 수정할 수 있습니다.");
+        }
+
         validatePasswordMatch(userUpdateRequestDto.getPassword(), user.getPassword());
 
 
@@ -113,8 +115,11 @@ public class UserService {
      * @param userDeleteRequestDto 유저 삭제 요청 데이터
      */
     @Transactional
-    public void deleteUser(Long id, UserDeleteRequestDto userDeleteRequestDto) {
+    public void deleteUser(Long id, UserDeleteRequestDto userDeleteRequestDto,  Long sessionUserId) {
         User user = userRepository.findByIdOrElseThrow(id);
+        if(!user.getId().equals(sessionUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 삭제할 수 있습니다.");
+        }
         validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
         scheduleRepository.deleteByUserId(id); // 해당 유저의 일정 먼저 삭제
         userRepository.delete(user);
@@ -129,45 +134,6 @@ public class UserService {
         }
 
         request.getSession().setAttribute("userId", user.getId());
-    }
-
-    /**
-     * 유저 생성 요청 데이터 검증
-     * - 작성자명, 비밀번호, 제목, 내용 필수값 확인
-     * - 작성자명: 최대 20자, 제목: 최대 30자, 내용: 최대 200자
-     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
-     */
-    private void validateUserRequest(UserRequestDto userRequestDto) {
-        if (userRequestDto.getName() == null || userRequestDto.getName().trim().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이름을 입력해주세요.");
-        }
-        if (userRequestDto.getEmail() == null || userRequestDto.getEmail().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요.");
-        }
-        if (userRequestDto.getPassword() == null || userRequestDto.getPassword().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요.");
-        }
-    }
-    /**
-     * 유저 생성 요청 데이터 검증
-     * - 작성자명, 비밀번호, 제목, 내용 필수값 확인
-     * - 작성자명: 최대 20자, 제목: 최대 30자, 내용: 최대 200자
-     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
-     */
-    private void validateUserUpdateRequest(UserUpdateRequestDto userUpdateRequestDto) {
-        if (userUpdateRequestDto.getPassword() == null || userUpdateRequestDto.getPassword().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "기존 비밀번호를 입력해주세요.");
-        }
-        if (userUpdateRequestDto.getName() != null && userUpdateRequestDto.getName().trim().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이름을 입력해주세요.");
-        }
-        if (userUpdateRequestDto.getEmail() != null && userUpdateRequestDto.getEmail().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요.");
-        }
-        if (userUpdateRequestDto.getNewPassword() != null && userUpdateRequestDto.getNewPassword().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "새 비밀번호를 입력해주세요.");
-        }
-
     }
 
     /**
