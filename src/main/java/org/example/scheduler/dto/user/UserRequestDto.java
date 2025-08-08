@@ -19,5 +19,6 @@ public class UserRequestDto {
     private String email;   // 이메일
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
+    @Size(min = 8, message = "비밀번호는 최소 8자 이상 작성해야 합니다.")
     private String password;
 }

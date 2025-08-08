@@ -19,5 +19,6 @@ public class UserUpdateRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password; // 기존 비밀번호
 
+    @Size(min = 8, message = "비밀번호는 최소 8자 이상 작성해야 합니다.")
     private String newPassword; // 새 비밀번호
 }
