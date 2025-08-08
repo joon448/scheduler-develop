@@ -37,7 +37,6 @@ public class ScheduleService {
      */
     @Transactional
     public ScheduleResponseDto saveSchedule(ScheduleRequestDto scheduleRequestDto, Long userId) {
-        validateScheduleRequest(scheduleRequestDto, "등록");
         User user = userRepository.findByIdOrElseThrow(userId);
 
         Schedule schedule = new Schedule(scheduleRequestDto.getTitle(), scheduleRequestDto.getContent());
@@ -148,39 +147,6 @@ public class ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
-
-    /**
-     * 일정 생성 요청 데이터 검증
-     * - 작성자명, 비밀번호, 제목, 내용 필수값 확인
-     * - 작성자명: 최대 20자, 제목: 최대 30자, 내용: 최대 200자
-     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
-     */
-    private void validateScheduleRequest(ScheduleRequestDto scheduleRequestDto, String action) {
-        if (scheduleRequestDto.getTitle() == null || scheduleRequestDto.getTitle().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목을 입력해주세요.");
-        }
-        if (scheduleRequestDto.getContent() == null || scheduleRequestDto.getContent().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 내용을 입력해주세요.");
-        }
-        if(scheduleRequestDto.getTitle().length() > 30){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목은 최대 30자까지 입력 가능합니다.");
-        }
-        if(scheduleRequestDto.getContent().length() > 200){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 내용은 최대 200자까지 입력 가능합니다.");
-        }
-    }
-
-    /**
-     * 일정 수정 요청 데이터 검증
-     * - 작성자명, 비밀번호, 제목 필수값 확인
-     * - 작성자명: 최대 20자, 제목: 최대 30자
-     * @throws ResponseStatusException 유효하지 않은 경우 400 반환
-     */
-    private void validateScheduleUpdateRequest(ScheduleUpdateRequestDto scheduleUpdateRequestDto, String action) {
-        if(scheduleUpdateRequestDto.getTitle() != null && scheduleUpdateRequestDto.getTitle().length() > 30){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 "+action+" 실패: 제목은 최대 30자까지 입력 가능합니다.");
-        }
-    }
 
 //    /**
 //     * 비밀번호 일치 검증

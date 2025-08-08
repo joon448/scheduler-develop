@@ -29,7 +29,7 @@ public class UserController {
      * @return 생성된 유저 정보
      */
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         return new ResponseEntity<>(userService.saveUser(userRequestDto), HttpStatus.CREATED);
     }
 
@@ -62,7 +62,7 @@ public class UserController {
      * @return 수정된 유저 정보
      */
     @PatchMapping("/users/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         return new ResponseEntity<>(userService.updateUser(id, userUpdateRequestDto),  HttpStatus.OK);
 
     }
@@ -74,7 +74,7 @@ public class UserController {
      * @param userDeleteRequestDto 삭제 요청 정보 (비밀번호)
      */
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @Valid @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
         userService.deleteUser(id, userDeleteRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -1,6 +1,7 @@
 package org.example.scheduler.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.comment.CommentRequestDto;
 import org.example.scheduler.dto.comment.CommentResponseDto;
@@ -26,19 +27,18 @@ public class ScheduleController {
      * @return 생성된 일정 정보
      */
     @PostMapping("/schedules")
-    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest httpRequest) {
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto scheduleRequestDto, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
         return new ResponseEntity<>(scheduleService.saveSchedule(scheduleRequestDto, userId), HttpStatus.CREATED);
     }
 
     /**
-     * 전체 일정 목록 또는 특정 작성자의 일정 목록 조회
+     * 전체 일정 목록 조회
      *
-     * @param name (선택) 작성자명으로 필터링할 경우 사용
      * @return 일정 목록 (최신 수정일 기준 정렬)
      */
     @GetMapping("/schedules")
-    public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<ScheduleResponseDto>> getSchedules() {
         return new ResponseEntity<>(scheduleService.getAllSchedules(),  HttpStatus.OK);
     }
 
@@ -72,7 +72,7 @@ public class ScheduleController {
      * @return 수정된 일정 정보
      */
     @PatchMapping("/schedules/{id}")
-    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto, HttpServletRequest httpRequest) {
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleUpdateRequestDto scheduleUpdateRequestDto, HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getSession().getAttribute("userId");
         return new ResponseEntity<>(scheduleService.updateSchedule(id, scheduleUpdateRequestDto, userId),  HttpStatus.OK);
 
