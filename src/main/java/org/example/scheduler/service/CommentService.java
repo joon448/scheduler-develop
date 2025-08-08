@@ -1,8 +1,10 @@
 package org.example.scheduler.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.comment.CommentRequestDto;
 import org.example.scheduler.dto.comment.CommentResponseDto;
+import org.example.scheduler.dto.comment.CommentUpdateRequestDto;
 import org.example.scheduler.entity.Comment;
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
@@ -11,10 +13,11 @@ import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 /**
  * 댓글 관련 비즈니스 로직을 처리하는 서비스
@@ -34,7 +37,7 @@ public class CommentService {
      * @return 생성된 댓글 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional
-    public CommentResponseDto saveComment(CommentRequestDto commentRequestDto, Long userId, Long scheduleId){
+    public CommentResponseDto addCommentToSchedule(CommentRequestDto commentRequestDto, Long userId, Long scheduleId){
         User user = userRepository.findByIdOrElseThrow(userId);
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
 
@@ -57,5 +60,17 @@ public class CommentService {
         if (commentRepository.countByScheduleId(scheduleId) >= 10) {
             throw new CustomException(ErrorCode.COMMENT_LIMIT_EXCEED);
         }
+    }
+
+    public List<CommentResponseDto> getCommentsByScheduleId(Long scheduleId) {
+    }
+
+    public CommentResponseDto getCommentById(Long scheduleId, Long commentId) {
+    }
+
+    public CommentResponseDto updateComment(Long scheduleId, Long commentId, Long userId, CommentUpdateRequestDto commentUpdateRequestDto) {
+    }
+
+    public void deleteComment(Long scheduleId, Long commentId, Long userId) {
     }
 }

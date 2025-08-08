@@ -116,7 +116,7 @@ public class ScheduleService {
      * @return 수정된 일정 정보 응답 DTO
      */
     @Transactional
-    public ScheduleResponseDto updateSchedule(Long id, ScheduleUpdateRequestDto scheduleUpdateRequestDto, Long sessionUserId) {
+    public ScheduleResponseDto updateSchedule(Long id, Long sessionUserId, ScheduleUpdateRequestDto scheduleUpdateRequestDto) {
         //validateScheduleUpdateRequest(scheduleUpdateRequestDto, "수정");
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
         if(!schedule.getUser().getId().equals(sessionUserId)){

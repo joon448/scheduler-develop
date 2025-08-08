@@ -80,7 +80,7 @@ public class UserController {
         Long userId = (Long) session.getAttribute("userId");
         userService.deleteUser(id, userDeleteRequestDto, userId);
         session.invalidate(); // 유저 삭제 시 세션 종료
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/login")
