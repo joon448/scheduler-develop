@@ -2,10 +2,7 @@ package org.example.scheduler.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.comment.CommentResponseDto;
-import org.example.scheduler.dto.schedule.ScheduleRequestDto;
-import org.example.scheduler.dto.schedule.ScheduleResponseDto;
-import org.example.scheduler.dto.schedule.ScheduleUpdateRequestDto;
-import org.example.scheduler.dto.schedule.ScheduleWithCommentsResponseDto;
+import org.example.scheduler.dto.schedule.*;
 import org.example.scheduler.entity.Schedule;
 import org.example.scheduler.entity.User;
 import org.example.scheduler.error.CustomException;
@@ -13,6 +10,9 @@ import org.example.scheduler.error.ErrorCode;
 import org.example.scheduler.repository.CommentRepository;
 import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,11 +53,12 @@ public class ScheduleService {
      * @return 전체 일정 목록 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional(readOnly = true)
-    public List<ScheduleResponseDto> getAllSchedules(){
-        return scheduleRepository.findAllByOrderByModifiedAtDesc()
-                .stream()
-                .map(ScheduleResponseDto::from)
-                .toList();
+    public Page<SchedulePageResponseDto> getAllSchedules(int page, int size){
+        if (page < 0 || size <= 0 || size > 100) {
+            throw new CustomException(ErrorCode.INVALID_PAGING_PARAM);
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return scheduleRepository.findPageByOrderByModifiedAtDesc(pageable);
     }
 
     /**
@@ -67,11 +68,12 @@ public class ScheduleService {
      * @return 특정 작성자의 일정 목록 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional(readOnly = true)
-    public List<ScheduleResponseDto> getSchedulesByUserId(Long userId) {
-        return scheduleRepository.findByUserIdOrderByModifiedAtDesc(userId) // 최신 수정일 기준 내림차순 정렬
-                .stream()
-                .map(ScheduleResponseDto::from)
-                .toList();
+    public Page<SchedulePageResponseDto> getSchedulesByUserId(Long userId, int page, int size) {
+        if (page < 0 || size <= 0 || size > 100) {
+            throw new CustomException(ErrorCode.INVALID_PAGING_PARAM);
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return scheduleRepository.findPageByUserIdOrderByModifiedAtDesc(userId, pageable);
     }
 
     /**
@@ -116,6 +118,7 @@ public class ScheduleService {
             schedule.updateContent(scheduleUpdateRequestDto.getContent());
         }
 
+        scheduleRepository.flush(); // 반환 schedule에 modifiedAt 반영되도록 flush
         return ScheduleResponseDto.from(schedule);
     }
 

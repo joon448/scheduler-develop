@@ -100,8 +100,9 @@ public class CommentService {
         if(commentUpdateRequestDto.getContent()!=null){
             comment.updateContent(commentUpdateRequestDto.getContent());
         }
-        return CommentResponseDto.from(comment);
 
+        commentRepository.flush(); // 반환 comment에 modifiedAt 반영되도록 flush
+        return CommentResponseDto.from(comment);
     }
 
     /**

@@ -112,6 +112,7 @@ public class UserService {
             user.updatePassword(newEncodedPassword);
         }
 
+        userRepository.flush(); // 반환 user에 modifiedAt 반영되도록 flush
         return UserResponseDto.from(user);
     }
 
