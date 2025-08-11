@@ -1,6 +1,5 @@
 package org.example.scheduler.error;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
@@ -8,6 +7,9 @@ import org.springframework.http.HttpStatusCode;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * 오류 정보를 응답할 때 사용하는 DTO
+ */
 @Getter
 @AllArgsConstructor
 public class ErrorResponse {

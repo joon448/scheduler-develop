@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 댓글 관련 비즈니스 로직을 처리하는 서비스
@@ -45,7 +44,7 @@ public class CommentService {
         comment.setSchedule(schedule);
 
         commentRepository.save(comment);
-        return new CommentResponseDto(comment);
+        return CommentResponseDto.from(comment);
     }
 
     /**
@@ -57,8 +56,8 @@ public class CommentService {
     public List<CommentResponseDto> getCommentsByScheduleId(Long scheduleId) {
         return commentRepository.findByScheduleIdOrderByModifiedAtDesc(scheduleId) // 최신 수정일 기준 내림차순 정렬
                 .stream()
-                .map(CommentResponseDto::new)
-                .collect(Collectors.toList());
+                .map(CommentResponseDto::from)
+                .toList();
     }
 
     /**
@@ -101,8 +100,7 @@ public class CommentService {
         if(commentUpdateRequestDto.getContent()!=null){
             comment.updateContent(commentUpdateRequestDto.getContent());
         }
-        commentRepository.flush();
-        return new CommentResponseDto(comment);
+        return CommentResponseDto.from(comment);
 
     }
 

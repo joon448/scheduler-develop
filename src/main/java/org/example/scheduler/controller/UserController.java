@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    // private final CommentService commentService;
 
     /**
      * 새로운 유저 등록
@@ -83,12 +82,20 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 로그인
+     *
+     * @param loginRequestDto 로그인 요청 정보
+     */
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
         userService.login(loginRequestDto, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * 로그아웃
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -97,19 +104,4 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
-
-//    /**
-//     * 특정 ID의 일정에 댓글 등록
-//     *
-//     * @param scheduleId 일정 ID
-//     * @param commentRequestDto 댓글 생성 요청 정보
-//     * @return 생성된 댓글 정보
-//     */
-//    @PostMapping("/schedules/{scheduleId}/comments")
-//    public CommentResponseDto createComment(@PathVariable Long scheduleId, @RequestBody CommentRequestDto commentRequestDto){
-//        return commentService.saveComment(commentRequestDto, scheduleId);
-//    }
-
 }

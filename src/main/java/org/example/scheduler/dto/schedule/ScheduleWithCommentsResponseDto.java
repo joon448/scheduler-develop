@@ -17,4 +17,8 @@ public class ScheduleWithCommentsResponseDto {
         this.schedule = scheduleResponseDto;
         this.comments = comments;
     }
+
+    public static ScheduleWithCommentsResponseDto of(ScheduleResponseDto scheduleResponseDto, List<CommentResponseDto> comments) {
+        return new ScheduleWithCommentsResponseDto(scheduleResponseDto, comments);
+    }
 }

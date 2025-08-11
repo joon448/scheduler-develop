@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 /**
- * 유저 생성 요청 시 전달받는 DTO
+ * 유저 삭제 요청 시 전달받는 DTO
  */
 @Getter
 public class UserDeleteRequestDto {

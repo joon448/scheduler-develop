@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 /**
- * 유저 생성 요청 시 전달받는 DTO
+ * 유저 수정 요청 시 전달받는 DTO
  */
 @Getter
 public class UserUpdateRequestDto {

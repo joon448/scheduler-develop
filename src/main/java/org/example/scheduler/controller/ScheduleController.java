@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.scheduler.dto.schedule.ScheduleRequestDto;
 import org.example.scheduler.dto.schedule.ScheduleResponseDto;
 import org.example.scheduler.dto.schedule.ScheduleUpdateRequestDto;
-import org.example.scheduler.service.CommentService;
+import org.example.scheduler.dto.schedule.ScheduleWithCommentsResponseDto;
 import org.example.scheduler.service.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService scheduleService;
-    private final CommentService commentService;
 
     /**
      * 새로운 일정 등록
@@ -33,35 +32,28 @@ public class ScheduleController {
     }
 
     /**
-     * 전체 일정 목록 조회
+     * 전체 일정 목록 또는 특정 작성자의 일정 목록 조회
      *
+     * @param userId (선택) 작성자 ID로 필터링할 경우 사용
      * @return 일정 목록 (최신 수정일 기준 정렬)
      */
     @GetMapping("/schedules")
-    public ResponseEntity<List<ScheduleResponseDto>> getSchedules() {
-        return new ResponseEntity<>(scheduleService.getAllSchedules(),  HttpStatus.OK);
+    public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@RequestParam(required = false) Long userId) {
+        if (userId == null) {
+            return new ResponseEntity<>(scheduleService.getAllSchedules(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(scheduleService.getSchedulesByUserId(userId), HttpStatus.OK);
     }
 
     /**
-     * 특정 ID의 일정과 그에 달린 댓글 목록 조회
-     *
-     * @param id 일정 ID
-     * @return 일정 + 댓글 정보
-     */
-//    @GetMapping("/schedules/{id}")
-//    public ResponseEntity<ScheduleWithCommentsResponseDto> getScheduleWithComments(@PathVariable Long id) {
-//        return new ResponseEntity<>(scheduleService.getScheduleWithCommentsById(id), HttpStatus.OK);
-//    }
-
-    /**
-     * 특정 ID의 일정 조회
+     * 특정 ID의 일정 및 일정에 달린 댓글 조회
      *
      * @param scheduleId 일정 ID
-     * @return 일정
+     * @return 일정 및 댓글
      */
     @GetMapping("/schedules/{scheduleId}")
-    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long scheduleId) {
-        return new ResponseEntity<>(scheduleService.getScheduleById(scheduleId), HttpStatus.OK);
+    public ResponseEntity<ScheduleWithCommentsResponseDto> getScheduleWithComments(@PathVariable Long scheduleId) {
+        return new ResponseEntity<>(scheduleService.getScheduleWithCommentsById(scheduleId), HttpStatus.OK);
     }
 
     /**
@@ -89,7 +81,4 @@ public class ScheduleController {
         scheduleService.deleteSchedule(scheduleId, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-
-
 }

@@ -5,6 +5,9 @@ import org.example.scheduler.entity.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * 유저 정보를 응답할 때 사용하는 DTO
+ */
 @Getter
 public class UserResponseDto {
     private Long id;                        // 유저 ID
@@ -19,5 +22,9 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
         this.modifiedAt = user.getModifiedAt();
+    }
+
+    public static UserResponseDto from(User user) {
+        return new UserResponseDto(user);
     }
 }

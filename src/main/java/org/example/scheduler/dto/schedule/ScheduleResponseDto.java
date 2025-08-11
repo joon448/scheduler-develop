@@ -26,4 +26,9 @@ public class ScheduleResponseDto {
         this.createdAt = schedule.getCreatedAt();
         this.modifiedAt = schedule.getModifiedAt();
     }
+
+    public static ScheduleResponseDto from(Schedule schedule) {
+        return new ScheduleResponseDto(schedule);
+    }
+
 }

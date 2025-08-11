@@ -22,12 +22,12 @@ public class Comment extends BaseEntity {
     @Setter
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private User user;     // 작성자
 
     @Setter
     @ManyToOne
     @JoinColumn(name = "scheduleId")
-    private Schedule schedule;
+    private Schedule schedule;     // 일정
 
     @Column(nullable = false, length = 100)
     private String content;     // 내용

@@ -22,10 +22,10 @@ public class Schedule extends BaseEntity {
     @Setter
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private User user;     // 작성자
 
     @Column(nullable = false, length = 30)
-    private String title;   //제목
+    private String title;   // 제목
 
     @Column(nullable = false, length = 200)
     private String content;     // 내용

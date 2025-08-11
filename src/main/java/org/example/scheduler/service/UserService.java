@@ -16,11 +16,8 @@ import org.example.scheduler.repository.ScheduleRepository;
 import org.example.scheduler.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 유저 관련 비즈니스 로직을 처리하는 서비스
@@ -29,11 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    //private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final CommentRepository commentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 유저 생성
@@ -43,9 +39,7 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto saveUser(UserRequestDto userRequestDto){
-
         if (userRepository.existsByEmail(userRequestDto.getEmail())){
-            // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 존재하는 이메일입니다.");
             throw new CustomException(ErrorCode.DUPLICATE_USER);
         }
 
@@ -53,21 +47,20 @@ public class UserService {
         User user = new User(userRequestDto.getName(), userRequestDto.getEmail(), encodedPassword);
 
         userRepository.save(user);
-        return new UserResponseDto(user);
+        return UserResponseDto.from(user);
     }
 
     /**
      * 전체 유저 조회
      *
-     * @return 전체 유저 목록 응답 DTO
+     * @return 전체 유저 목록 응답 DTO (최신 수정일 순 정렬)
      */
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers(){
-        return userRepository.findAll() // 최신 수정일 기준 내림차순 정렬
+        return userRepository.findAllByOrderByModifiedAtDesc() // 최신 수정일 기준 내림차순 정렬
                 .stream()
-                .sorted(Comparator.comparing(User::getModifiedAt).reversed())
-                .map(UserResponseDto::new)
-                .collect(Collectors.toList());
+                .map(UserResponseDto::from)
+                .toList();
     }
 
     /**
@@ -79,28 +72,26 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findByIdOrElseThrow(userId);
-        return new UserResponseDto(user);
+        return UserResponseDto.from(user);
     }
 
     /**
      * 특정 유저 수정
      *
      * @param userId 유저 ID
+     * @param sessionUserId 세션 유저 ID
      * @param userUpdateRequestDto 유저 수정 요청 데이터
      * @return 수정된 유저 정보 응답 DTO
      */
     @Transactional
     public UserResponseDto updateUser(Long userId, Long sessionUserId, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findByIdOrElseThrow(userId);
-        if(!user.getId().equals(sessionUserId)){
 
+        if(!user.getId().equals(sessionUserId)){
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인의 정보만 수정할 수 있습니다.");
-            // throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 정보만 수정할 수 있습니다.");
         }
 
-
         validatePasswordMatch(userUpdateRequestDto.getPassword(), user.getPassword());
-
 
         if(userUpdateRequestDto.getName()!=null){
             user.updateName(userUpdateRequestDto.getName());
@@ -121,29 +112,32 @@ public class UserService {
             user.updatePassword(newEncodedPassword);
         }
 
-        userRepository.flush(); // 반환 user에 modifiedAt 반영되도록 flush
-        return new UserResponseDto(user);
+        return UserResponseDto.from(user);
     }
 
     /**
      * 특정 유저 및 관련 일정, 댓글 삭제
      *
      * @param userId 유저 ID
+     * @param sessionUserId 세션 유저 ID
      * @param userDeleteRequestDto 유저 삭제 요청 데이터
      */
     @Transactional
     public void deleteUser(Long userId,  Long sessionUserId, UserDeleteRequestDto userDeleteRequestDto) {
         User user = userRepository.findByIdOrElseThrow(userId);
         if(!user.getId().equals(sessionUserId)){
-            //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 삭제할 수 있습니다.");
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인만 삭제할 수 있습니다.");
         }
         validatePasswordMatch(userDeleteRequestDto.getPassword(), user.getPassword());
-        commentRepository.deleteByUserId(userId); // 해당 유저의 댓글 먼저 삭제
-        scheduleRepository.deleteByUserId(userId); // 해당 유저의 일정 먼저 삭제
+
+        commentRepository.deleteByUserId(userId); // 해당 유저의 댓글 먼저 삭제 (단방향 연관관계)
+        scheduleRepository.deleteByUserId(userId); // 해당 유저의 일정 먼저 삭제 (단방향 연관관계)
         userRepository.delete(user);
     }
 
+    /**
+     * 로그인
+     */
     @Transactional(readOnly = true)
     public void login(LoginRequestDto loginRequestDto, HttpServletRequest request) {
         User user = userRepository.findByEmailOrElseThrow(loginRequestDto.getEmail());
@@ -154,7 +148,7 @@ public class UserService {
 
     /**
      * 비밀번호 일치 검증
-     * @throws ResponseStatusException 유효하지 않은 경우 401 반환
+     * @throws CustomException 유효하지 않은 경우 401 반환
      */
     private void validatePasswordMatch (String inputPassword, String storedPassword) {
         if (!passwordEncoder.matches(inputPassword, storedPassword)) {
