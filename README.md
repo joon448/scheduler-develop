@@ -117,168 +117,60 @@ src/main/java/com/example/scheduler
 
 ## API 명세
 
-| 기능 | Method | URL | 설명 |
-|------|--------|-----|------|
-| 일정 생성 | POST | `/schedules` | 새 일정 등록 |
-| 전체 조회 | GET | `/schedules` | 전체 일정 조회 |
-| 단일 조회 | GET | `/schedules/{id}` | 댓글 포함 응답 |
-| 일정 수정 | PATCH | `/schedules/{id}` | 제목/작성자명 수정, 비밀번호 필요 |
-| 일정 삭제 | DELETE | `/schedules/{id}` | 비밀번호 필요 |
-| 댓글 작성 | POST | `/schedules/{id}/comments` | 댓글 10개 제한, 비밀번호 필요 |
+# API Documentation
 
+## AUTH
 
-### 일정 생성
-- **Method**: POST
-- **URL**: /schedules
-- **Request Body**:
+| 기능   | Method | URL      | Request                                | Response (Success)  | Response (Fail)       | 상세                                                    |
+|--------|--------|----------|----------------------------------------|---------------------|-----------------------|---------------------------------------------------------|
+| 로그인  | POST   | /login   | { "email": "string", "password": "string" } | 200 OK              | 401 (이메일/비번 불일치), 400 (검증 실패) |                                                         |
+| 로그아웃 | POST   | /logout  | -                                      | 200 OK              | -                     |                                                         |
+
+## USER
+
+| 기능           | Method | URL         | Request                                                            | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                   |
+|----------------|--------|-------------|--------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 회원가입        | POST   | /signup     | { "name": "string", "email": "string", "password": "string" }       | 201 Created <br> { "id": Long, "name": "string", "email": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400 (유효성 검증, 이메일 중복)        | password 최소 8자, 이메일 중복 체크                                                                                                        |
+| 유저 목록 조회   | GET    | /users      | -                                                                  | 200 OK <br> [{ "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }, ...] | -                                        | page: 기본 0, size: 기본 10                                                                                                                                                     |
+| 유저 단일 조회   | GET    | /users/{id} | -                                                                  | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }   | 404 (존재하지 않음)                     |                                                                                                                                                        |
+| 유저 수정        | PATCH  | /users/{id} | { "name"?, "email"?, "password": "oldPassword", "newPassword"? }    | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 401 (비번 불일치), 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, newPassword 최소 8자, 이메일 변경 시 중복 체크                                                            |
+| 유저 삭제        | DELETE | /users/{id} | { "password": "string" }                                           | 204 No Content                                              | 401(비번 불일치), 403(본인 아님), 404 (존재하지 않음) | 본인만 가능, 삭제 후 세션 무효화, 연관 일정/댓글 선삭제 처리                                                                                           |
+
+## SCHEDULE
+
+| 기능            | Method | URL               | Request                                      | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                               |
+|-----------------|--------|-------------------|----------------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 일정 생성       | POST   | /schedules        | { "title": "string", "content": "string" }    | 201 Created <br> { "id": Long, "userId": Long, "title": "string", "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400 (유효성 검증)                        | title 길이 30 이내 필수값, content 길이 200 이내 필수값                                                                                                            |
+| 전체 일정 조회 (페이징) | GET    | /schedules?userId={userId}&page={page}&size={size} | -                                            | 200 OK <br> [{ "id": Long, "title": "string", "content": "string", "commentCount": long, "createdAt": LocalDateTime, "modifiedAt": LocalDateTime, "userName": "string" }, ...] | 400 (유효성 검증)                        | page: 기본 0, size: 기본 10, 최대 100                                                                                                                                                    |
+| 단일 일정 및 댓글 조회 | GET    | /schedules/{id}   | -                                            | 200 OK <br> { "schedule": { "id": Long, "userId": Long, "title": "string", "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }, "comments": [...] } | 404 (존재하지 않음)                     |                                                                                                                                                                     |
+| 일정 수정        | PATCH  | /schedules/{id}   | { "title"?, "content"? }                      | 200 OK <br> { "id": Long, "userId": Long, "title": "string", "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 403(본인 아님), 400(유효성 검증), 404 (존재하지 않음) | title 길이 30 이내, content 길이 200 이내                                                                                                                                             |
+| 일정 삭제        | DELETE | /schedules/{id}   | -                                            | 204 No Content                                              | 403(본인 아님), 404 (존재하지 않음)       | 본인만 가능, 연관 댓글 선삭제 처리                                                                                               |
+
+## COMMENT
+
+| 기능            | Method | URL                           | Request                                | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                               |
+|-----------------|--------|-------------------------------|----------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 댓글 생성       | POST   | /schedules/{scheduleId}/comments | { "content": "string" }                | 201 Created <br> { "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400 (유효성 검증), 404 (존재하지 않음)  | content 길이 100 이내                                                                                                                                                              |
+| 댓글 목록 조회  | GET    | /schedules/{scheduleId}/comments | -                                      | 200 OK <br> [{ "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }, ...] | 404 (존재하지 않음)                     | page: 기본 0, size: 기본 10                                                                                                                                                             |
+| 댓글 단일 조회  | GET    | /schedules/{scheduleId}/comments/{commentId} | -                                      | 200 OK <br> { "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400(경로 - 일정 불일치), 404 (존재하지 않음) |                                                                                                                                                                     |
+| 댓글 수정       | PATCH  | /schedules/{scheduleId}/comments/{commentId} | { "content": "string" }                | 200 OK <br> { "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, content 길이 최대 100자 이내                                                                                           |
+| 댓글 삭제       | DELETE | /schedules/{scheduleId}/comments/{commentId} | -                                      | 204 No Content                                              | 403(본인 아님), 404 (존재하지 않음)       | 본인만 가능                                                                                                                                                              |
+
+## ERROR Responses
+
+### Common Error Response Format:
 ```json
 {
-  "title": String,
-  "content": String,
-  "name": String,
-  "password": String
-}
-```
-- **Response**: 
-  - 성공시: 200 OK
-```json
-{
-  "id": Long,
-  "title": String,
-  "content": String,
-  "name": String,
-  "createdAt": DateTime,
-  "modifiedAt": DateTime
-}
-```
-  - 실패시:
-    - 400 Bad Request: 필수값이 없는 경우, 길이 제한을 초과한 경우
-
----
-
-### 전체 일정 조회
-- **Method**: GET
-- **URL**: /schedules?name=
-- **Response**:
-  - 성공시: 200 OK
-```json
-[
-  {
-    "id": Long,
-    "title": String,
-    "content": String,
-    "name": String,
-    "createdAt": DateTime,
-    "modifiedAt": DateTime
+  "status": 400,
+  "errorCode": "VAL-001",
+  "message": "유효성 검증에 실패했습니다.",
+  "path": "/schedules",
+  "timestamp": "2025-08-08T12:34:56",
+  "errors": {
+    "title": "제목은 최대 30자입니다"
   }
-]
-```
-  - 조건에 맞는 결과가 없을 경우:
-```json
-[]
-```
-
----
-
-### 단일 일정 조회
-- **Method**: GET
-- **URL**: /schedules/{id}
-- **Response**:
-  - 성공시: 200 OK
-```json
-{
-  schedule: {
-    "id": Long,
-    "title": String,
-    "content": String,
-    "name": String,
-    "createdAt": DateTime,
-    "modifiedAt": DateTime
-  }
-  comments: [
-    //...
-  ]
 }
 ```
-  - 실패시:
-    - 404 Not Found: 해당 ID가 존재하지 않을 경우
-
----
-
-### 일정 수정
-- **Method**: PATCH
-- **URL**: /schedules/{id}
-- **Request Body**:
-```json
-{
-  "title": String, 
-  "name": String,
-  "password": String
-}
-```
-- **Response**:
-  - 성공시: 200 OK
-```json
-{
-  "id": Long,
-  "title": String,
-  "content": String,
-  "name": String,
-  "createdAt": DateTime,
-  "modifiedAt": DateTime
-}
-```
-  - 실패시:
-    - 404 Not Found: ID가 존재하지 않음
-    - 400 Bad Request: 필수값 누락, 길이 제한 초과, title&name 둘 다 없는 경우
-    - 401 Unauthorized: 비밀번호 불일치
-
----
-
-### 일정 삭제
-- **Method**: DELETE
-- **URL**: /schedules/{id}
-- **Request Body**:
-```json
-{
-  "password": String
-}
-```
-- **Response**:
-  - 성공시: 200 OK
-  - 실패시:
-    - 404 Not Found: ID가 존재하지 않음
-    - 400 Bad Request: 필수값 누락
-    - 401 Unauthorized: 비밀번호 불일치
-
----
-
-### 댓글 생성
-- **Method**: POST
-- **URL**: /schedules/{id}/comments
-- **Request Body**:
-```json
-{
-  "content": String,
-  "name": String,
-  "password": String
-}
-```
-- **Response**: 
-  - 성공시: 200 OK
-```json
-{
-  "id": Long,
-  "content": String,
-  "name": String,
-  "scheduleId": Long,
-  "createdAt": DateTime,
-  "modifiedAt": DateTime
-}
-```
-  - 실패시:
-    - 404 Not Found: ID가 존재하지 않음
-    - 400 Bad Request: 필수값이 없는 경우, 길이 제한을 초과한 경우
 
 ---
 
