@@ -100,33 +100,17 @@ src/main/java/com/example/scheduler
 └── SchedulerApplication.java
 ```
 
----
-
-## 주요 클래스 설명
-
-| 클래스 | 설명 |
-|--------|------|
-| `Schedule` | 일정 정보를 담는 Entity |
-| `Comment` | 일정에 달린 댓글 정보를 담는 Entity |
-| `ScheduleController` | 일정 및 댓글 관련 API를 처리하는 컨트롤러 |
-| `ScheduleService` | 일정 로직을 처리하는 서비스 |
-| `CommentService` | 댓글 로직을 처리하는 서비스 |
-| `BaseEntity` | 생성일, 수정일을 자동 처리하는 공통 추상 클래스 (JPA Auditing) |
-
----
 
 ## API 명세
 
-# API Documentation
-
-## AUTH
+### AUTH
 
 | 기능   | Method | URL      | Request                                | Response (Success)  | Response (Fail)       | 상세                                                    |
 |--------|--------|----------|----------------------------------------|---------------------|-----------------------|---------------------------------------------------------|
 | 로그인  | POST   | /login   | { "email": "string", "password": "string" } | 200 OK              | 401 (이메일/비번 불일치), 400 (검증 실패) |                                                         |
 | 로그아웃 | POST   | /logout  | -                                      | 200 OK              | -                     |                                                         |
 
-## USER
+### USER
 
 | 기능           | Method | URL         | Request                                                            | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                   |
 |----------------|--------|-------------|--------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -136,7 +120,7 @@ src/main/java/com/example/scheduler
 | 유저 수정        | PATCH  | /users/{id} | { "name"?, "email"?, "password": "oldPassword", "newPassword"? }    | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 401 (비번 불일치), 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, newPassword 최소 8자, 이메일 변경 시 중복 체크                                                            |
 | 유저 삭제        | DELETE | /users/{id} | { "password": "string" }                                           | 204 No Content                                              | 401(비번 불일치), 403(본인 아님), 404 (존재하지 않음) | 본인만 가능, 삭제 후 세션 무효화, 연관 일정/댓글 선삭제 처리                                                                                           |
 
-## SCHEDULE
+### SCHEDULE
 
 | 기능            | Method | URL               | Request                                      | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                               |
 |-----------------|--------|-------------------|----------------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -146,7 +130,7 @@ src/main/java/com/example/scheduler
 | 일정 수정        | PATCH  | /schedules/{id}   | { "title"?, "content"? }                      | 200 OK <br> { "id": Long, "userId": Long, "title": "string", "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 403(본인 아님), 400(유효성 검증), 404 (존재하지 않음) | title 길이 30 이내, content 길이 200 이내                                                                                                                                             |
 | 일정 삭제        | DELETE | /schedules/{id}   | -                                            | 204 No Content                                              | 403(본인 아님), 404 (존재하지 않음)       | 본인만 가능, 연관 댓글 선삭제 처리                                                                                               |
 
-## COMMENT
+### COMMENT
 
 | 기능            | Method | URL                           | Request                                | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                               |
 |-----------------|--------|-------------------------------|----------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -156,9 +140,9 @@ src/main/java/com/example/scheduler
 | 댓글 수정       | PATCH  | /schedules/{scheduleId}/comments/{commentId} | { "content": "string" }                | 200 OK <br> { "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, content 길이 최대 100자 이내                                                                                           |
 | 댓글 삭제       | DELETE | /schedules/{scheduleId}/comments/{commentId} | -                                      | 204 No Content                                              | 403(본인 아님), 404 (존재하지 않음)       | 본인만 가능                                                                                                                                                              |
 
-## ERROR Responses
+### ERROR Responses
 
-### Common Error Response Format:
+#### Common Error Response Format:
 ```json
 {
   "status": 400,
