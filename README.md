@@ -18,7 +18,7 @@ Spring Boot와 JPA를 활용하여 일정, 유저, 댓글을 CRUD 할 수 있는
 ### Lv 2. 유저 CRUD
 - 유저 생성, 조회, 수정, 삭제
 - 필드: `유저명`, `이메일`, `작성일`, `수정일`
-- 일정 ↔ 유저 연관관계 설정 (`작성 유저명` → `유저 고유 식별자`로 변경)
+- 일정 - 유저 연관관계 설정 (`작성 유저명` → `유저 고유 식별자`로 변경)
 
 ### Lv 3. 회원가입
 - 유저에 `비밀번호` 필드 추가 (암호화는 도전 기능에서 적용)
@@ -43,7 +43,7 @@ Spring Boot와 JPA를 활용하여 일정, 유저, 댓글을 CRUD 할 수 있는
 
 ### Lv 7. 댓글 CRUD
 - 일정에 대한 댓글 생성, 조회, 수정, 삭제
-- 댓글 ↔ 유저 ↔ 일정 연관관계 설정
+- 댓글 - 유저 - 일정 연관관계 설정
 
 ### Lv 8. 일정 페이징 조회
 - `Pageable` & `Page` 활용
@@ -284,10 +284,7 @@ src/main/java/com/example/scheduler
 
 ## ERD
 
-### 1) 필수 과제 ERD
-
-
-### 2) 도전 과제 ERD
+<img width="592" height="338" alt="ScheduleApp-Develop_ERD" src="https://github.com/user-attachments/assets/ff26498d-a7bc-475b-bda4-5bb47d661642" />
 
 
 ---
