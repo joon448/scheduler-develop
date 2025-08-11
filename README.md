@@ -140,6 +140,9 @@ src/main/java/com/example/scheduler
 | 댓글 수정       | PATCH  | /schedules/{scheduleId}/comments/{commentId} | { "content": "string" }                | 200 OK <br> { "id": Long, "scheduleId": Long, "userId": Long, "content": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, content 길이 최대 100자 이내                                                                                           |
 | 댓글 삭제       | DELETE | /schedules/{scheduleId}/comments/{commentId} | -                                      | 204 No Content                                              | 403(본인 아님), 404 (존재하지 않음)       | 본인만 가능                                                                                                                                                              |
 
+./Scheduler-develop.postman_collection.json : Postman Collection 문서
+
+
 ### ERROR Responses
 
 #### Common Error Response Format:
@@ -155,6 +158,7 @@ src/main/java/com/example/scheduler
   }
 }
 ```
+
 
 ---
 
