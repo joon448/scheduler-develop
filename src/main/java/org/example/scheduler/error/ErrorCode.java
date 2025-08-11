@@ -21,10 +21,12 @@ public enum ErrorCode {
     DUPLICATE_USER(HttpStatus.BAD_REQUEST, "USER-001", "이미 가입된 사용자입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-404", "존재하지 않는 사용자입니다."),
 
+    INVALID_PAGING_PARAM(HttpStatus.BAD_REQUEST, "SCH-400", "page/size 파라미터가 올바르지 않습니다. size는 최대 100까지 가능합니다."),
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCH-404", "존재하지 않는 일정입니다."),
 
     COMMENT_SCHEDULE_MISMATCH(HttpStatus.BAD_REQUEST, "CMT-400", "댓글이 요청한 일정에 속하지 않습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CMT-404", "존재하지 않는 댓글입니다.");
+
 
     private final HttpStatus status;
     private final String code;

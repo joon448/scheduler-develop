@@ -3,11 +3,9 @@ package org.example.scheduler.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.scheduler.dto.schedule.ScheduleRequestDto;
-import org.example.scheduler.dto.schedule.ScheduleResponseDto;
-import org.example.scheduler.dto.schedule.ScheduleUpdateRequestDto;
-import org.example.scheduler.dto.schedule.ScheduleWithCommentsResponseDto;
+import org.example.scheduler.dto.schedule.*;
 import org.example.scheduler.service.ScheduleService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,11 +36,13 @@ public class ScheduleController {
      * @return 일정 목록 (최신 수정일 기준 정렬)
      */
     @GetMapping("/schedules")
-    public ResponseEntity<List<ScheduleResponseDto>> getSchedules(@RequestParam(required = false) Long userId) {
+    public ResponseEntity<Page<SchedulePageResponseDto>> getSchedulesPage(@RequestParam(required = false) Long userId,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size) {
         if (userId == null) {
-            return new ResponseEntity<>(scheduleService.getAllSchedules(), HttpStatus.OK);
+            return new ResponseEntity<>(scheduleService.getAllSchedules(page, size), HttpStatus.OK);
         }
-        return new ResponseEntity<>(scheduleService.getSchedulesByUserId(userId), HttpStatus.OK);
+        return new ResponseEntity<>(scheduleService.getSchedulesByUserId(userId, page, size), HttpStatus.OK);
     }
 
     /**
