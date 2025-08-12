@@ -114,10 +114,10 @@ src/main/java/com/example/scheduler
 
 | 기능           | Method | URL         | Request                                                            | Response (Success)                                           | Response (Fail)                          | 상세                                                                                                                                                   |
 |----------------|--------|-------------|--------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 회원가입        | POST   | /signup     | { "name": "string", "email": "string", "password": "string" }       | 201 Created <br> { "id": Long, "name": "string", "email": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400 (유효성 검증, 이메일 중복)        | password 최소 8자, 이메일 중복 체크                                                                                                        |
+| 회원가입        | POST   | /signup     | { "name": "string", "email": "string", "password": "string" }       | 201 Created <br> { "id": Long, "name": "string", "email": "string", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 400 (유효성 검증), 409 (이메일 중복)        | password 최소 8자, 이메일 중복 체크                                                                                                        |
 | 유저 목록 조회   | GET    | /users      | -                                                                  | 200 OK <br> [{ "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }, ...] | -                                        | page: 기본 0, size: 기본 10                                                                                                                                                     |
 | 유저 단일 조회   | GET    | /users/{id} | -                                                                  | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime }   | 404 (존재하지 않음)                     |                                                                                                                                                        |
-| 유저 수정        | PATCH  | /users/{id} | { "name"?, "email"?, "password": "oldPassword", "newPassword"? }    | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 401 (비번 불일치), 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음) | 로그인 본인만 가능, newPassword 최소 8자, 이메일 변경 시 중복 체크                                                            |
+| 유저 수정        | PATCH  | /users/{id} | { "name"?, "email"?, "password": "oldPassword", "newPassword"? }    | 200 OK <br> { "id": Long, "name": "string", "email": "email", "createdAt": LocalDateTime, "modifiedAt": LocalDateTime } | 401 (비번 불일치), 403(본인 아님), 400 (유효성 검증), 404 (존재하지 않음), 409 (이메일 중복) | 로그인 본인만 가능, newPassword 최소 8자, 이메일 변경 시 중복 체크                                                            |
 | 유저 삭제        | DELETE | /users/{id} | { "password": "string" }                                           | 204 No Content                                              | 401(비번 불일치), 403(본인 아님), 404 (존재하지 않음) | 본인만 가능, 삭제 후 세션 무효화, 연관 일정/댓글 선삭제 처리                                                                                           |
 
 ### SCHEDULE
@@ -200,6 +200,9 @@ src/main/java/com/example/scheduler
 
 8. **커스텀 예외 메시지 우선 출력**
    - 기본 메시지보다 커스텀 메시지가 먼저 나오도록 ExceptionHandler 수정
+
+9. **JPQL 적용하여 페이지네이션 구현**
+   - 단방향 연관관계(일정-댓글)에서 댓글 개수를 가져오기 위해 쿼리 작성함
 
 ---
 
