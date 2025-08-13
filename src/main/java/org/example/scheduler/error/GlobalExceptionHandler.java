@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,                                  // 어느 필드가
-                        DefaultMessageSourceResolvable::getDefaultMessage,     // 무슨 메시지로 실패했는지
+                        FieldError::getDefaultMessage,     // 무슨 메시지로 실패했는지
                         (a, b) -> a,                             // 같은 필드는 첫 메시지 우선
                         LinkedHashMap::new                                     // 순서 유지
                 ));
