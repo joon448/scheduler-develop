@@ -37,7 +37,7 @@ public class LoginFilter implements Filter {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.setCharacterEncoding("UTF-8");
             httpResponse.setContentType("application/json;charset=UTF-8");
-            httpResponse.getWriter().write("{\"status\":401,\"message\":\"로그인 후 이용 가능합니다.\"}");
+            httpResponse.getWriter().write("{\"status\":401,\"errorCode\":\"AUTH-401\",\"message\":\"로그인 후 이용 가능합니다.\"}");
             return;
         }
 
