@@ -159,8 +159,10 @@ public class UserService {
     public void deleteUserAndData(Long userId) {
         List<Long> scheduleIds = scheduleRepository.findIdsByUserId(userId);
         commentRepository.deleteByUserId(userId); // 해당 유저의 댓글 먼저 삭제 (단방향 연관관계)
-        commentRepository.deleteByScheduleIdIn(scheduleIds); // 해당 유저의 일정에 달린 댓글 먼저 삭제
-        scheduleRepository.deleteByUserId(userId); // 해당 유저의 일정 먼저 삭제 (단방향 연관관계)
+        if(!scheduleIds.isEmpty()){
+            commentRepository.deleteByScheduleIdIn(scheduleIds); // 해당 유저의 일정에 달린 댓글 먼저 삭제
+            scheduleRepository.deleteByUserId(userId); // 해당 유저의 일정 먼저 삭제 (단방향 연관관계)
+        }
         userRepository.deleteById(userId);
     }
 

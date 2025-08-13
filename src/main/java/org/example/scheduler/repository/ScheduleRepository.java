@@ -80,5 +80,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
      */
     void deleteByUserId(Long userId);
 
-    List<Long> findIdsByUserId(Long userId);
+    @Query("select s.id from Schedule s where s.user.id = :userId")
+    List<Long> findIdsByUserId(@Param("userId") Long userId);
 }
