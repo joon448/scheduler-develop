@@ -42,4 +42,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>{
      * @param userId 유저 ID
      */
     void deleteByUserId(Long userId);
+
+    void deleteByScheduleIdIn(List<Long> scheduleIds);
 }

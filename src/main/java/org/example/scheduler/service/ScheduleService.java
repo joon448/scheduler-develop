@@ -136,7 +136,12 @@ public class ScheduleService {
             throw new CustomException(ErrorCode.FORBIDDEN_NOT_OWNER, "본인이 작성한 일정만 삭제할 수 있습니다.");
         }
 
+        deleteScheduleAndData(scheduleId);
+    }
+
+    @Transactional
+    public void deleteScheduleAndData(Long scheduleId) {
         commentRepository.deleteByScheduleId(scheduleId); // 해당 일정의 댓글 먼저 삭제 (단방향 연관관계)
-        scheduleRepository.delete(schedule);
+        scheduleRepository.deleteById(scheduleId);
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 
 /**
  * Schedule Entity에 대한 JPA 리포지토리 인터페이스
@@ -77,4 +79,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
      */
     void deleteByUserId(Long userId);
 
+    List<Long> findIdsByUserId(Long userId);
 }
