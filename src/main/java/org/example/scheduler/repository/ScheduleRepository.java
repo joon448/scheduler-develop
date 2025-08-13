@@ -34,10 +34,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(
         value = """
             select new org.example.scheduler.dto.schedule.SchedulePageResponseDto (
-                s.id, s.title, s.content, coalesce(count(c.id), 0L), s.createdAt, s.modifiedAt, u.name
+                 s.id, s.title, s.content, (select count(c.id) from Comment c where c.schedule = s), s.createdAt, s.modifiedAt, u.name
             )
-            from Schedule s join s.user u left join Comment c on c.schedule = s
-            group by s.id, s.title, s.content, s.createdAt, s.modifiedAt, u.name
+            from Schedule s join s.user u
             order by s.modifiedAt desc
         """,
         countQuery = """
@@ -57,11 +56,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(
         value = """
             select new org.example.scheduler.dto.schedule.SchedulePageResponseDto (
-                 s.id, s.title, s.content, coalesce(count(c.id), 0L), s.createdAt, s.modifiedAt, u.name
+                 s.id, s.title, s.content, (select count(c.id) from Comment c where c.schedule = s), s.createdAt, s.modifiedAt, u.name
              )
-            from Schedule s join s.user u left join Comment c on c.schedule = s
+            from Schedule s join s.user u
             where u.id = :userId
-            group by s.id, s.title, s.content, s.createdAt, s.modifiedAt, u.name
             order by s.modifiedAt desc
         """,
         countQuery = """
