@@ -142,10 +142,444 @@ src/main/java/com/example/scheduler
 
 ./Scheduler-develop.postman_collection.json : Postman Collection 문서
 
+# 요청 및 응답 예시
 
-### ERROR Responses
+---
 
-#### Common Error Response Format:
+## 1. AUTH
+
+### 1) 로그인
+
+**POST /login**
+
+```json
+// 요청
+{
+    "email": "qwe1@qwe.com",
+    "password": "11111111"
+}
+```
+
+```
+// 응답 (200 OK)
+```
+
+---
+
+### 2) 로그아웃
+
+**POST /logout**
+
+```
+// 응답 (200 OK)
+```
+
+---
+
+## 2. USER
+
+### 1) 회원가입
+
+**POST /signup**
+
+```json
+// 요청
+{
+    "name": "11",
+    "email": "qwe1@qwe.com",
+    "password": "11111111"
+}
+```
+
+```json
+// 응답 (201 Created)
+{
+    "id": 1,
+    "name": "11",
+    "email": "qwe1@qwe.com",
+    "createdAt": "2025-08-12T20:39:46.9401505",
+    "modifiedAt": "2025-08-12T20:39:46.9401505"
+}
+```
+
+---
+
+### 2) 유저 전체 조회
+
+**GET /users**
+
+```json
+// 응답 (200 OK)
+[
+    {
+        "id": 2,
+        "name": "22",
+        "email": "qwe2@qwe.com",
+        "createdAt": "2025-08-08T19:45:43.935697",
+        "modifiedAt": "2025-08-08T19:47:13.730426"
+    },
+    {
+        "id": 1,
+        "name": "11",
+        "email": "qwe1@qwe.com",
+        "createdAt": "2025-08-08T19:45:57.115509",
+        "modifiedAt": "2025-08-08T19:45:57.115509"
+    }
+]
+```
+
+---
+
+### 3) 유저 단일 조회
+
+**GET /users/{userId}**
+
+```json
+// 응답 (200 OK)
+{
+    "id": 1,
+    "name": "11",
+    "email": "qwe1@qwe.com",
+    "createdAt": "2025-08-08T19:45:43.935697",
+    "modifiedAt": "2025-08-08T19:47:13.730426"
+}
+```
+
+---
+
+### 4) 유저 수정
+
+**PATCH /users/{userId}**
+
+```json
+// 요청
+{
+    "name":"11수정함",
+    "password":"11111111"
+}
+```
+
+```json
+// 응답 (200 OK)
+{
+    "id": 1,
+    "name": "11수정함",
+    "email": "qwe1@qwe.com",
+    "createdAt": "2025-08-08T19:45:43.935697",
+    "modifiedAt": "2025-08-12T20:42:36.7928243"
+}
+```
+
+---
+
+### 5) 유저 삭제
+
+**DELETE /users/{userId}**
+
+```json
+// 요청
+{
+    "password": "11111111"
+}
+```
+
+```
+// 응답 (204 No Content)
+```
+
+---
+
+## 3. SCHEDULE
+
+### 1) 일정 생성
+
+**POST /schedules**
+
+```json
+// 요청
+{
+    "title": "제목",
+    "content": "내용"
+}
+```
+
+```json
+// 응답 (201 Created)
+{
+    "id": 1,
+    "userId": 1,
+    "title": "제목",
+    "content": "내용",
+    "createdAt": "2025-08-12T20:46:35.5681833",
+    "modifiedAt": "2025-08-12T20:46:35.5681833"
+}
+```
+
+---
+
+### 2) 일정 전체 조회 (페이지)
+
+**GET /schedules**
+
+| 파라미터 | 타입 | 설명 | 상세 |
+| -------- | ---- | ---- | ---- |
+| userId   | Long | 작성자 ID | (선택) |
+| page     | int  | 페이지 | (선택) 기본 0 |
+| size     | int  | 결과 개수 | (선택) 기본 10, 최대 100 |
+
+```json
+// 응답 (200 OK)
+{
+    "content": [
+        {
+            "id": 4,
+            "title": "제목",
+            "content": "내용",
+            "commentCount": 0,
+            "createdAt": "2025-08-12T20:46:35.568183",
+            "modifiedAt": "2025-08-12T20:46:35.568183",
+            "userName": "11수정함"
+        },
+        {
+            "id": 2,
+            "title": "qwer1",
+            "content": "내용1",
+            "commentCount": 0,
+            "createdAt": "2025-08-08T19:47:42.906091",
+            "modifiedAt": "2025-08-08T19:47:42.906091",
+            "userName": "11수정함"
+        },
+        {
+            "id": 1,
+            "title": "qwer",
+            "content": "내용",
+            "commentCount": 2,
+            "createdAt": "2025-08-08T19:47:34.336517",
+            "modifiedAt": "2025-08-08T19:47:34.336517",
+            "userName": "11수정함"
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": true,
+    "totalElements": 3,
+    "totalPages": 1,
+    "size": 5,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 3,
+    "empty": false
+}
+```
+
+---
+
+### 3) 일정 단일 조회
+
+**GET /schedules/{scheduleId}**
+
+```json
+// 응답 (200 OK)
+{
+    "comments": [
+        {
+            "id": 4,
+            "userId": 1,
+            "scheduleId": 1,
+            "content": "댓글2",
+            "createdAt": "2025-08-08T20:21:08.330616",
+            "modifiedAt": "2025-08-08T20:21:08.330616"
+        },
+        {
+            "id": 2,
+            "userId": 1,
+            "scheduleId": 1,
+            "content": "댓글",
+            "createdAt": "2025-08-08T20:15:30.136355",
+            "modifiedAt": "2025-08-08T20:15:30.136355"
+        }
+    ],
+    "schedule": {
+        "id": 1,
+        "userId": 1,
+        "title": "qwer",
+        "content": "내용",
+        "createdAt": "2025-08-08T19:47:34.336517",
+        "modifiedAt": "2025-08-08T19:47:34.336517"
+    }
+}
+```
+
+---
+
+### 4) 일정 수정
+
+**PATCH /schedules/{scheduleId}**
+
+```json
+// 요청
+{
+    "title": "제목수정함"
+}
+```
+
+```json
+// 응답 (200 OK)
+{
+    "id": 1,
+    "userId": 1,
+    "title": "제목수정함",
+    "content": "내용",
+    "createdAt": "2025-08-08T19:47:34.336517",
+    "modifiedAt": "2025-08-12T20:58:43.6591477"
+}
+```
+
+---
+
+### 5) 일정 삭제
+
+**DELETE /schedules/{scheduleId}**
+
+```
+// 응답 (204 No Content)
+```
+
+---
+
+## 4. COMMENT
+
+### 1) 댓글 생성
+
+**POST /schedules/{scheduleId}/comments**
+
+```json
+// 요청
+{
+    "content": "댓글"
+}
+```
+
+```json
+// 응답 (201 Created)
+{
+    "id": 5,
+    "userId": 1,
+    "scheduleId": 1,
+    "content": "댓글",
+    "createdAt": "2025-08-12T21:00:31.5056736",
+    "modifiedAt": "2025-08-12T21:00:31.5056736"
+}
+```
+
+---
+
+### 2) 댓글 목록 조회
+
+**GET /schedules/{scheduleId}/comments**
+
+```json
+// 응답 (200 OK)
+[
+    {
+        "id": 5,
+        "userId": 1,
+        "scheduleId": 1,
+        "content": "댓글3",
+        "createdAt": "2025-08-12T21:00:31.505674",
+        "modifiedAt": "2025-08-12T21:00:31.505674"
+    },
+    {
+        "id": 4,
+        "userId": 1,
+        "scheduleId": 1,
+        "content": "댓글2",
+        "createdAt": "2025-08-08T20:21:08.330616",
+        "modifiedAt": "2025-08-08T20:21:08.330616"
+    },
+    {
+        "id": 2,
+        "userId": 1,
+        "scheduleId": 1,
+        "content": "댓글",
+        "createdAt": "2025-08-08T20:15:30.136355",
+        "modifiedAt": "2025-08-08T20:15:30.136355"
+    }
+]
+```
+
+---
+
+### 3) 댓글 단일 조회
+
+**GET /schedules/{scheduleId}/comments/{commentId}**
+
+```json
+// 응답 (200 OK)
+{
+    "id": 1,
+    "userId": 1,
+    "scheduleId": 1,
+    "content": "댓글",
+    "createdAt": "2025-08-08T20:15:30.136355",
+    "modifiedAt": "2025-08-08T20:15:30.136355"
+}
+```
+
+---
+
+### 4) 댓글 수정
+
+**PATCH /schedules/{scheduleId}/comments/{commentId}**
+
+```json
+// 요청
+{
+    "content": "댓글수정함"
+}
+```
+
+```json
+// 응답 (200 OK)
+{
+    "id": 1,
+    "userId": 1,
+    "scheduleId": 1,
+    "content": "댓글수정함",
+    "createdAt": "2025-08-08T20:15:30.136355",
+    "modifiedAt": "2025-08-12T21:02:10.9417525"
+}
+```
+
+---
+
+### 5) 댓글 삭제
+
+**DELETE /schedules/{scheduleId}/comments/{commentId}**
+
+```
+// 응답 (204 No Content)
+```
+
+---
+
+## ERROR 응답
+
 ```json
 {
   "status": 400,
@@ -158,6 +592,30 @@ src/main/java/com/example/scheduler
   }
 }
 ```
+
+```json
+{
+    "status": 403,
+    "errorCode": "AUTH-403",
+    "message": "본인만 삭제할 수 있습니다.",
+    "path": "/users/3",
+    "timestamp": "2025-08-12T20:45:31.1630731",
+    "errors": null
+}
+```
+
+| 코드       | HTTP 상태 | 설명                    | 메시지                         |
+| ---------- | --------- | ----------------------- | ------------------------------ |
+| VAL-400    | 400       | VALIDATION_FAILED       | 유효성 검증에 실패했습니다.    |
+| AUTH-400   | 400       | PASSWORD_SAME_AS_OLD    | 새 비밀번호가 기존 비밀번호와 동일합니다. |
+| AUTH-401   | 401       | PASSWORD_INCORRECT      | 비밀번호가 올바르지 않습니다.  |
+| AUTH-403   | 403       | FORBIDDEN_NOT_OWNER     | 접근 권한이 없습니다.          |
+| USER-404   | 404       | USER_NOT_FOUND          | 존재하지 않는 사용자입니다.    |
+| USER-409   | 409       | DUPLICATE_USER          | 이미 가입된 사용자입니다.      |
+| SCH-400    | 400       | INVALID_PAGING_PARAM    | page/size 파라미터가 올바르지 않습니다. size는 최대 100까지 가능합니다. |
+| SCH-404    | 404       | SCHEDULE_NOT_FOUND      | 존재하지 않는 일정입니다.      |
+| CMT-400    | 400       | COMMENT_SCHEDULE_MISMATCH | 댓글이 요청한 일정에 속하지 않습니다. |
+| CMT-404    | 404       | COMMENT_NOT_FOUND       | 존재하지 않는 댓글입니다.      |
 
 
 ---
